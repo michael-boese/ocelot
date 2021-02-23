@@ -1,5 +1,8 @@
+from ocelot.cpbd.transformations.params.second_order_params import SecondOrderParams
+from ocelot.cpbd.transformations.params.first_order_params import FirstOrderParams
 import numpy as np
 
+from ocelot.cpbd.transformations.params.tm_params_factory import TMParamsFactory
 from ocelot.cpbd.transformations.transfer_map import TransferMap
 from ocelot.cpbd.transformations.second_order import SecondTM
 from ocelot.cpbd.transformations.kick import KickTM
@@ -9,7 +12,7 @@ from ocelot.cpbd.high_order import t_nnn
 from ocelot.cpbd.r_matrix import rot_mtx, uni_matrix
 
 
-class Element(object):
+class Element(TMParamsFactory):
     """
     Element is a basic beamline building element
     Accelerator optics elements are subclasses of Element
@@ -19,7 +22,8 @@ class Element(object):
     default_tm = TransferMap
     additional_tms = [SecondTM, KickTM, RungeKuttaTrTM, RungeKuttaTM]
 
-    def __init__(self, eid=None):
+    def __init__(self, eid=None, has_edge=False):
+        self.has_edge = has_edge
         self.id = eid
         if eid is None:
             self.id = "ID_{0}_".format(np.random.randint(100000000))
@@ -44,13 +48,38 @@ class Element(object):
         except:
             return False
 
+    def _default_B(self, R):
+        return np.dot((np.eye(6) - R), np.array([[self.dx], [0.], [self.dy], [0.], [0.], [0.]]))
+
+    def create_first_order_main_params(self, energy: float, delta_length: float = 0.0) -> FirstOrderParams:
+        k1 = self.k1
+        if self.l == 0:
+            hx = 0.
+        else:
+            hx = self.angle / self.l
+        if delta_length != 0.0:
+            R = uni_matrix(delta_length, k1, hx=hx, sum_tilts=0, energy=energy)
+        else:
+            R = uni_matrix(self.l, k1, hx=hx, sum_tilts=0, energy=energy)
+
+        B = self._default_B(R)
+
+        return FirstOrderParams(R, B)
+
+    def create_second_order_main_params(self, energy: float, delta_length: float = 0.0) -> SecondOrderParams:
+        T = t_nnn(delta_length if delta_length else self.l, 0. if self.l == 0 else self.angle / self.l, self.k1, self.k2,
+                  energy)
+        first_order_params = self.create_first_order_main_params(energy, delta_length)
+        return SecondOrderParams(first_order_params.R, first_order_params.B, T)
+
     def create_r_matrix(self):
         k1 = self.k1
         if self.l == 0:
             hx = 0.
         else:
             hx = self.angle / self.l
-        r_z_e = lambda z, energy: uni_matrix(z, k1, hx=hx, sum_tilts=0, energy=energy)
+
+        def r_z_e(z, energy): return uni_matrix(z, k1, hx=hx, sum_tilts=0, energy=energy)
         return r_z_e
 
     def get_T_z_e_func(self):

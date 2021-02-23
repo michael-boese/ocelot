@@ -1,8 +1,7 @@
-from ocelot.cpbd.elements.optic_element import OpticElement
-from ocelot.cpbd.elements.sbend_atom import SBendAtom
-from ocelot.cpbd.transformations.transfer_map import TransferMap
+from ocelot.cpbd.elements.bend_atom import BendAtom
 
-class SBend(OpticElement):
+
+class SBendAtom(BendAtom):
     """
     sector bending magnet,
     l - length of magnet in [m],
@@ -20,6 +19,6 @@ class SBend(OpticElement):
     """
 
     def __init__(self, l=0., angle=0.0, k1=0.0, k2=0., e1=0.0, e2=0.0, tilt=0.0,
-                 gap=0, h_pole1=0., h_pole2=0., fint=0., fintx=None, eid=None, tm=TransferMap):
-        super().__init__(SBendAtom(l=l, angle=angle, k1=k1, k2=k2, e1=e1, e2=e2, tilt=tilt,
-                      gap=gap, h_pole1=h_pole1, h_pole2=h_pole2, fint=fint, fintx=fintx, eid=eid), tm=tm)
+                 gap=0, h_pole1=0., h_pole2=0., fint=0., fintx=None, eid=None):
+        super().__init__(l=l, angle=angle, k1=k1, k2=k2, e1=e1, e2=e2, tilt=tilt,
+                      gap=gap, h_pole1=h_pole1, h_pole2=h_pole2, fint=fint, fintx=fintx, eid=eid)

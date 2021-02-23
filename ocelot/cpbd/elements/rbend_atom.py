@@ -1,10 +1,8 @@
 from ocelot.cpbd.r_matrix import uni_matrix
-from ocelot.cpbd.elements.optic_element import OpticElement
-from ocelot.cpbd.elements.rbend_atom import RBendAtom
-from ocelot.cpbd.transformations.transfer_map import TransferMap
+from ocelot.cpbd.elements.bend_atom import BendAtom
+from ocelot.cpbd.transformations.params.first_order_params import FirstOrderParams
 
-
-class RBend(OpticElement):
+class RBendAtom(BendAtom):
     """
     rectangular bending magnet,
     l - length of magnet in [m],
@@ -22,7 +20,7 @@ class RBend(OpticElement):
     """
 
     def __init__(self, l=0., angle=0., k1=0., k2=0., e1=None, e2=None, tilt=0.,
-                 gap=0, h_pole1=0., h_pole2=0., fint=0., fintx=None, eid=None, tm=TransferMap):
+                 gap=0, h_pole1=0., h_pole2=0., fint=0., fintx=None, eid=None):
         if e1 is None:
             e1 = angle / 2.
         else:
@@ -32,5 +30,10 @@ class RBend(OpticElement):
         else:
             e2 += angle / 2.
 
-        super().__init__(RBendAtom(l=l, angle=angle, e1=e1, e2=e2, k1=k1, k2=k2, tilt=tilt,
-                      gap=gap, h_pole1=h_pole1, h_pole2=h_pole2, fint=fint, fintx=fintx, eid=eid), tm=tm)
+        super().__init__(l=l, angle=angle, e1=e1, e2=e2, k1=k1, k2=k2, tilt=tilt,
+                      gap=gap, h_pole1=h_pole1, h_pole2=h_pole2, fint=fint, fintx=fintx, eid=eid)
+
+    def create_first_order_main_params(self, energy: float, delta_length: float) -> FirstOrderParams:
+        R = uni_matrix(delta_length if delta_length != 0.0 else self.l, 0, hx=0, sum_tilts=0, energy=energy)
+        B = self._default_B(R)
+        return FirstOrderParams(R, B)
