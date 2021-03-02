@@ -4,16 +4,18 @@ import pytest
 import json
 import os
 
+import numpy as np
+
 
 class Data():
     def __init__(self, ground_truth_data):
         self.ground_truth_data = ground_truth_data
 
     def get_R(self, element_name: str):
-        return self.ground_truth_data[element_name]['R']
+        return [np.array(R, dtype='float64') for R in self.ground_truth_data[element_name]['R']]
 
     def get_B(self, element_name: str):
-        return self.ground_truth_data[element_name]['B']
+        return [np.array(B, dtype='float64') for B in self.ground_truth_data[element_name]['B']]
 
     def get_energy(self, element_name: str):
         return self.ground_truth_data[element_name]['energy_list']
