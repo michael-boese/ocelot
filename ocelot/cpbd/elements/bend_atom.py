@@ -2,8 +2,8 @@ import numpy as np
 
 
 from ocelot.cpbd.elements.element import Element
-from ocelot.cpbd.transformations.params.first_order_params import FirstOrderParams
-from ocelot.cpbd.transformations.params.second_order_params import SecondOrderParams
+from ocelot.cpbd.tm_params.first_order_params import FirstOrderParams
+from ocelot.cpbd.tm_params.second_order_params import SecondOrderParams
 from ocelot.cpbd.high_order import fringe_ent, fringe_ext
 
 
@@ -58,6 +58,10 @@ class BendAtom(Element):
         return s
 
     def _R_edge(self, fint, edge):
+        if self.l != 0.:
+            self.h = self.angle / self.l
+        else:
+            self.h = 0
         sec_e = 1. / np.cos(edge)
         phi = fint * self.h * self.gap * sec_e * (1. + np.sin(edge) ** 2)
         R = np.eye(6)
@@ -65,24 +69,24 @@ class BendAtom(Element):
         R[3, 2] = -self.h * np.tan(edge - phi)
         return R
 
-    def create_first_order_entrance_params(self, energy: float) -> FirstOrderParams:
-        R = self._R_edge(self, self.fint, self.e1)
+    def create_first_order_entrance_params(self, energy: float, delta_length: float = 0.0) -> FirstOrderParams:
+        R = self._R_edge(self.fint, self.e1)
         B = self._default_B(R)
         return FirstOrderParams(R, B)
 
-    def create_first_order_exit_params(self, energy: float) -> FirstOrderParams:
-        R = self._R_edge(self, self.fintx, self.e2)
+    def create_first_order_exit_params(self, energy: float, delta_length: float = 0.0) -> FirstOrderParams:
+        R = self._R_edge(self.fintx, self.e2)
         B = self._default_B(R)
         return FirstOrderParams(R, B)
 
-    def create_second_order_entrance_params(self, energy: float) -> SecondOrderParams:
+    def create_second_order_entrance_params(self, energy: float, delta_length: float = 0.0) -> SecondOrderParams:
         first_order_params = self.create_first_order_entrance_params(energy)
         _, T = fringe_ent(h=self.h, k1=self.k1, e=self.e1, h_pole=self.h_pole1,
                           gap=self.gap, fint=self.fint)
         return SecondOrderParams(first_order_params.R, first_order_params.B, T)
 
-    def create_second_order_exit_params(self, energy: float) -> SecondOrderParams:
+    def create_second_order_exit_params(self, energy: float, delta_length: float = 0.0) -> SecondOrderParams:
         first_order_params = self.create_first_order_exit_params(energy)
-        _, T = fringe_ext(h=self.h, k1=self.k1, e=self.e2, h_pole=self.h_pole,
+        _, T = fringe_ext(h=self.h, k1=self.k1, e=self.e2, h_pole=self.h_pole2,
                           gap=self.gap, fint=self.fintx)
         return SecondOrderParams(first_order_params.R, first_order_params.B, T)

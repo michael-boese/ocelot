@@ -5,7 +5,8 @@ from ocelot.cpbd.transformations.second_order import SecondTM
 from ocelot.cpbd.high_order import m_e_GeV
 from ocelot.common.globals import speed_of_light
 from ocelot.cpbd.elements.element import Element
-from ocelot.cpbd.transformations.params.first_order_params import FirstOrderParams
+from ocelot.cpbd.tm_params.first_order_params import FirstOrderParams
+
 
 class TDCavityAtom(Element):
     """
@@ -39,10 +40,9 @@ class TDCavityAtom(Element):
         return s
 
     def create_first_order_main_params(self, energy: float, delta_length: float) -> FirstOrderParams:
-        R = self.R_main_matrix(energy=energy, length= delta_length if delta_length else self.l)
+        R = self.R_main_matrix(energy=energy, length=delta_length if delta_length else self.l)
         B = self._default_B(R)
         return FirstOrderParams(R, B)
-
 
     def R_main_matrix(self, energy, length):
         """

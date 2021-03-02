@@ -4,12 +4,12 @@ import numpy as np
 
 from ocelot.cpbd.high_order import m_e_GeV
 from ocelot.common.globals import speed_of_light
-from ocelot.cpbd.transformations.transfer_map import TransferMap
+from ocelot.cpbd.transformations.transformation import Transformation
 
 
-class CavityTM(TransferMap):
+class CavityTM(Transformation):
     def __init__(self, v=0, freq=0., phi=0.):
-        TransferMap.__init__(self)
+        super().__init__()
         self.v = v
         self.freq = freq
         self.phi = phi

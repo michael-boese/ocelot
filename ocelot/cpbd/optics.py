@@ -68,7 +68,7 @@ def lattice_transfer_map(lattice, energy):
     Ra = np.eye(6)
     Ta = np.zeros((6, 6, 6))
     Ba = np.zeros((6, 1))
-    E = energy
+
     for i, elem in enumerate(lattice.sequence):
         Rb = elem.transfer_map.R(E)
         Bb = elem.transfer_map.B(E)
@@ -121,7 +121,7 @@ def trace_obj(lattice, obj, nPoints=None):
     if nPoints is None:
         obj_list = [obj]
         for e in lattice.sequence:
-            obj = e.transfer_map * obj
+            obj = e.dot_tms(obj)
             obj.id = e.id
             obj_list.append(obj)
     else:

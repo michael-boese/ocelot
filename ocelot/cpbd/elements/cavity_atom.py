@@ -7,7 +7,7 @@ from ocelot.cpbd.high_order import m_e_GeV
 from ocelot.common.globals import speed_of_light
 from ocelot.cpbd.r_matrix import uni_matrix
 from ocelot.cpbd.elements.element import Element
-from ocelot.cpbd.transformations.params.first_order_params import FirstOrderParams
+from ocelot.cpbd.tm_params.first_order_params import FirstOrderParams
 
 logger = logging.getLogger(__name__)
 
@@ -171,12 +171,18 @@ class CavityAtom(Element):
         return FirstOrderParams(R, B)
 
     def create_first_order_entrance_params(self, energy: float, delta_length: float) -> FirstOrderParams:
-        R = self._R_edge_matrix(self, energy=energy, vxx=self.vxx_up, vxy=self.vxy_up)
+        R = self._R_edge_matrix(energy=energy, vxx=self.vxx_up, vxy=self.vxy_up)
         B = self._default_B(R)
         return FirstOrderParams(R, B)
 
     def create_first_order_exit_params(self, energy: float, delta_length: float) -> FirstOrderParams:
-        R = self._R_edge_matrix(self, energy=energy, vxx=self.vxx_down, vxy=self.vxy_down)
+        R = self._R_edge_matrix(energy=energy, vxx=self.vxx_down, vxy=self.vxy_down)
         B = self._default_B(R)
         return FirstOrderParams(R, B)
-        
+
+    def create_delta_e(self, total_length, delta_length=0.0) -> float:
+        if delta_length != 0.0:
+            phase_term = np.cos(self.phi * np.pi / 180.)
+            return phase_term * self.v * delta_length / total_length if total_length != 0 else phase_term * self.v
+        else:
+            return self.v * np.cos(self.phi * np.pi / 180.)

@@ -1,5 +1,5 @@
-from ocelot.cpbd.transformations.params.first_order_params import FirstOrderParams
-from ocelot.cpbd.transformations.params.second_order_params import SecondOrderParams
+from ocelot.cpbd.tm_params.first_order_params import FirstOrderParams
+from ocelot.cpbd.tm_params.second_order_params import SecondOrderParams
 
 
 class TMParamsFactory:
@@ -12,7 +12,10 @@ class TMParamsFactory:
 
     def __not_impl_error_message(self, func_name: str) -> str:
         return f"class {self.__class__.__name__} have to implement {func_name}."
-    
+
+    def create_delta_e(self, total_length, delta_length=0.0) -> float:
+        raise NotImplementedError(self.__not_impl_error_message(self.get_delta_e.__name__)) 
+
     # First Order
     def create_first_order_main_params(self, energy: float, delta_length: float) -> FirstOrderParams:
         raise NotImplementedError(self.__not_impl_error_message(self.create_first_order_main_params.__name__))

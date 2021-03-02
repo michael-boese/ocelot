@@ -16,6 +16,7 @@ class HcorAtom(RBendAtom):
 
     def __init__(self, l=0., angle=0., eid=None):
         super().__init__(l=l, angle=angle, eid=eid)
+        self.has_edge = False
         self.l = l
         self.angle = angle
         self.tilt = 0.

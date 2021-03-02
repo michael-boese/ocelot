@@ -3,7 +3,7 @@ import numpy as np
 from ocelot.cpbd.high_order import m_e_GeV
 from ocelot.cpbd.elements.element import Element
 from ocelot.cpbd.field_map import FieldMap
-from ocelot.cpbd.transformations.params.first_order_params import FirstOrderParams
+from ocelot.cpbd.tm_params.first_order_params import FirstOrderParams
 
 
 class UndulatorAtom(Element):

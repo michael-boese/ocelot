@@ -1,6 +1,7 @@
 from ocelot.cpbd.r_matrix import uni_matrix
 from ocelot.cpbd.elements.bend_atom import BendAtom
-from ocelot.cpbd.transformations.params.first_order_params import FirstOrderParams
+from ocelot.cpbd.tm_params.first_order_params import FirstOrderParams
+
 
 class RBendAtom(BendAtom):
     """
@@ -31,9 +32,9 @@ class RBendAtom(BendAtom):
             e2 += angle / 2.
 
         super().__init__(l=l, angle=angle, e1=e1, e2=e2, k1=k1, k2=k2, tilt=tilt,
-                      gap=gap, h_pole1=h_pole1, h_pole2=h_pole2, fint=fint, fintx=fintx, eid=eid)
+                         gap=gap, h_pole1=h_pole1, h_pole2=h_pole2, fint=fint, fintx=fintx, eid=eid)
 
-    def create_first_order_main_params(self, energy: float, delta_length: float) -> FirstOrderParams:
+    def create_first_order_main_params(self, energy: float, delta_length: float = 0.0) -> FirstOrderParams:
         R = uni_matrix(delta_length if delta_length != 0.0 else self.l, 0, hx=0, sum_tilts=0, energy=energy)
         B = self._default_B(R)
         return FirstOrderParams(R, B)

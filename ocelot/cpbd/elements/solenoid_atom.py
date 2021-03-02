@@ -1,6 +1,6 @@
 import numpy as np
 
-from ocelot.cpbd.transformations.params.first_order_params import FirstOrderParams
+from ocelot.cpbd.tm_params.first_order_params import FirstOrderParams
 from ocelot.cpbd.high_order import m_e_GeV
 from ocelot.cpbd.elements.element import Element
 
@@ -27,7 +27,7 @@ class SolenoidAtom(Element):
     def create_first_order_main_params(self, energy: float, delta_length: float) -> FirstOrderParams:
         R = self.R_main_matrix(energy=energy, length=delta_length if delta_length != 0.0 else self.l)
         B = self._default_B(R)
-        FirstOrderParams(R, B)
+        return FirstOrderParams(R, B)
 
     def R_main_matrix(self, energy, length):
 
@@ -59,4 +59,3 @@ class SolenoidAtom(Element):
             return sol_matrix
 
         return sol(length, k=self.k, energy=energy)
-

@@ -117,6 +117,69 @@ class Twiss:
                 self.gamma_y = (1 + beam.alpha_y * beam.alpha_y) / beam.beta_y
             self.E = beam.E
 
+    def multiply_with_tm(self, tm: 'TransferMap'):
+        tws = self.map_x_twiss(R = lambda energy: tm.get_params(energy=energy).R, delta_e=tm.get_delta_e())
+        tws.s = self.s + tm.length
+        return tws
+
+    def map_x_twiss(self, R, delta_e=0.0):
+        E = self.E
+        M = R(E)
+        zero_tol = 1.e-10
+        if abs(delta_e) > zero_tol:
+            Ei = self.E
+            Ef = self.E + delta_e
+            k = np.sqrt(Ef / Ei)
+            M[0, 0] = M[0, 0] * k
+            M[0, 1] = M[0, 1] * k
+            M[1, 0] = M[1, 0] * k
+            M[1, 1] = M[1, 1] * k
+            M[2, 2] = M[2, 2] * k
+            M[2, 3] = M[2, 3] * k
+            M[3, 2] = M[3, 2] * k
+            M[3, 3] = M[3, 3] * k
+            E = Ef
+
+        tws = copy(self)  # twiss just hold primitive types
+        tws.E = E
+
+        tws.beta_x = M[0, 0] * M[0, 0] * self.beta_x - 2 * M[0, 1] * M[0, 0] * self.alpha_x + M[0, 1] * M[0, 1] * self.gamma_x
+        # tws.beta_x = ((M[0,0]*tws.beta_x - M[0,1]*self.alpha_x)**2 + M[0,1]*M[0,1])/self.beta_x
+        tws.beta_y = M[2, 2] * M[2, 2] * self.beta_y - 2 * M[2, 3] * M[2, 2] * self.alpha_y + M[2, 3] * M[2, 3] * self.gamma_y
+        # tws.beta_y = ((M[2,2]*tws.beta_y - M[2,3]*self.alpha_y)**2 + M[2,3]*M[2,3])/self.beta_y
+        tws.alpha_x = -M[0, 0] * M[1, 0] * self.beta_x + (M[0, 1] * M[1, 0] + M[1, 1] * M[0, 0]) * self.alpha_x - M[0, 1] * M[
+            1, 1] * self.gamma_x
+        tws.alpha_y = -M[2, 2] * M[3, 2] * self.beta_y + (M[2, 3] * M[3, 2] + M[3, 3] * M[2, 2]) * self.alpha_y - M[2, 3] * M[
+            3, 3] * self.gamma_y
+
+        tws.gamma_x = (1. + tws.alpha_x * tws.alpha_x) / tws.beta_x
+        tws.gamma_y = (1. + tws.alpha_y * tws.alpha_y) / tws.beta_y
+
+        tws.Dx = M[0, 0] * self.Dx + M[0, 1] * self.Dxp + M[0, 5]
+        tws.Dy = M[2, 2] * self.Dy + M[2, 3] * self.Dyp + M[2, 5]
+
+        tws.Dxp = M[1, 0] * self.Dx + M[1, 1] * self.Dxp + M[1, 5]
+        tws.Dyp = M[3, 2] * self.Dy + M[3, 3] * self.Dyp + M[3, 5]
+        denom_x = M[0, 0] * self.beta_x - M[0, 1] * self.alpha_x
+        if denom_x == 0.:
+            d_mux = np.pi / 2. * M[0, 1] / np.abs(M[0, 1])
+        else:
+            d_mux = np.arctan(M[0, 1] / denom_x)
+
+        if d_mux < 0:
+            d_mux += np.pi
+        tws.mux = self.mux + d_mux
+        denom_y = M[2, 2] * self.beta_y - M[2, 3] * self.alpha_y
+        if denom_y == 0.:
+            d_muy = np.pi / 2. * M[2, 3] / np.abs(M[2, 3])
+        else:
+            d_muy = np.arctan(M[2, 3] / denom_y)
+        if d_muy < 0:
+            d_muy += np.pi
+        tws.muy = self.muy + d_muy
+
+        return tws
+
     def __str__(self):
         val = ""
         val += "emit_x  = " + str(self.emit_x) + "\n"
@@ -168,6 +231,10 @@ class Particle:
         val = val + "E = " + str(self.E) + "\n"
         val = val + "s = " + str(self.s)
         return val
+
+    def multiply_with_tm(self, tm: 'TransferMap'):
+        tm.apply(self)
+        return deepcopy(self)
 
 
 class Beam:
