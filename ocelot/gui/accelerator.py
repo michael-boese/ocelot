@@ -2,7 +2,12 @@
 user interface for viewing/editing electron optics layouts
 """
 
-import sys, os, csv
+from ocelot.cpbd.physics_proc import *
+from scipy import stats
+from ocelot.cpbd.beam import global_slice_analysis
+import sys
+import os
+import csv
 import numbers
 import matplotlib
 from matplotlib.figure import Figure
@@ -55,14 +60,14 @@ def plot_lattice(lat, axis, alpha=1.0, params={'kmax': 2.0, 'ang_max': 0.5e-2}, 
         if e.__class__ in [Bend, SBend, RBend, Hcor, Vcor]:
             axis.add_patch(mpatches.Rectangle(offs + np.array([pos, 0.0]), dx,
                                               np.sign(-e.angle) * min_dipole_height - e.angle / ang_max * (
-                                                      1 - min_dipole_height),
-                                              color='#0099FF', alpha=alpha))
+                1 - min_dipole_height),
+                color='#0099FF', alpha=alpha))
 
         if e.__class__ in [Solenoid]:
             axis.add_patch(mpatches.Rectangle(offs + np.array([pos, 0.0]), dx,
                                               np.sign(-e.k) * min_solenoid_height - e.k / sol_max * (
-                                                      1 - min_solenoid_height),
-                                              color='#FF99FF', alpha=alpha))
+                1 - min_solenoid_height),
+                color='#FF99FF', alpha=alpha))
 
         if e.__class__ in [Quadrupole]:
 
@@ -825,14 +830,13 @@ def show_density(x, y, ax=None, nbins_x=250, nbins_y=250, interpolation="bilinea
     ax.imshow(H, interpolation=interpolation, aspect='auto', origin='lower',
               extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]], vmin=vmin, cmap=my_rainbow)
 
-    if xlabel is not None: ax.set_xlabel(xlabel)
-    if ylabel is not None: ax.set_ylabel(ylabel)
+    if xlabel is not None:
+        ax.set_xlabel(xlabel)
+    if ylabel is not None:
+        ax.set_ylabel(ylabel)
     ax.grid(grid)
 
     plt.setp(ax.get_xticklabels(), visible=show_xtick_label)
-
-
-from ocelot.cpbd.beam import global_slice_analysis
 
 
 def show_e_beam(p_array, nparts_in_slice=5000, smooth_param=0.05, nbins_x=200, nbins_y=200,
@@ -1248,7 +1252,7 @@ def show_e_beam_reduced(p_array, nparts_in_slice=5000, smooth_param=0.05, nbins_
     # ax_sp = plt.subplot(225)
     # plt.title("Energy spread")
     # plt.plot(slice_params.s * 1e3, slice_params.se*1e-3, "b")
-    ##plt.legend()
+    # plt.legend()
     # plt.xlabel("s [mm]")
     # plt.ylabel("$\sigma_E$ [keV]")
     # plt.grid(grid)
@@ -1304,9 +1308,9 @@ def show_e_beam_reduced(p_array, nparts_in_slice=5000, smooth_param=0.05, nbins_
 
 
 def show_e_beam_slices(p_array, nparts_in_slice=5000, smooth_param=0.05, inverse_tau=False, figname=50,
-                     title=None, figsize=None, grid=True,
-                     filename=None, headtail=True,
-                     filter_base=2, filter_iter=2, tau_units="mm", slice=0):
+                       title=None, figsize=None, grid=True,
+                       filename=None, headtail=True,
+                       filter_base=2, filter_iter=2, tau_units="mm", slice=0):
     """
     Shows e-beam slice parameters (current, emittances, energy spread)
     and beam distributions (dE/(p0 c), X, Y) against long. coordinate (S)
@@ -1538,10 +1542,6 @@ def beam_jointplot(p_array, show_plane="x", nparts_in_slice=5000, smooth_param=0
         plt.savefig(filename)
 
     return ax_top, ax_down
-
-
-from scipy import stats
-from ocelot.cpbd.physics_proc import *
 
 
 class Save3DBeamDensity(PhysProc):

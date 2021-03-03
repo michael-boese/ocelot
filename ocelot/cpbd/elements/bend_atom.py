@@ -5,6 +5,7 @@ from ocelot.cpbd.elements.element import Element
 from ocelot.cpbd.tm_params.first_order_params import FirstOrderParams
 from ocelot.cpbd.tm_params.second_order_params import SecondOrderParams
 from ocelot.cpbd.high_order import fringe_ent, fringe_ext
+from ocelot.cpbd.r_matrix import rot_mtx
 
 
 class BendAtom(Element):
@@ -71,11 +72,13 @@ class BendAtom(Element):
 
     def create_first_order_entrance_params(self, energy: float, delta_length: float = 0.0) -> FirstOrderParams:
         R = self._R_edge(self.fint, self.e1)
+        R = np.dot(np.dot(rot_mtx(-self.tilt), R), rot_mtx(self.tilt))
         B = self._default_B(R)
         return FirstOrderParams(R, B)
 
     def create_first_order_exit_params(self, energy: float, delta_length: float = 0.0) -> FirstOrderParams:
         R = self._R_edge(self.fintx, self.e2)
+        R = np.dot(np.dot(rot_mtx(-self.tilt), R), rot_mtx(self.tilt))
         B = self._default_B(R)
         return FirstOrderParams(R, B)
 

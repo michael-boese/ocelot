@@ -16,13 +16,12 @@ class TMTypes(enum.Enum):
     EXIT = 2
     MAIN = 3
 
-
 class Transformation(ABC):
     """
     TransferMap is a basic class of all TransferMaps and defines the Interface for them.
     """
 
-    def __init__(self, create_tm_param_func, delta_e_func, length: float) -> None:
+    def __init__(self, create_tm_param_func, delta_e_func, length: float, tm_type: TMTypes) -> None:
         """[summary]
 
         Args:
@@ -31,12 +30,16 @@ class Transformation(ABC):
         """
         self.create_tm_param_func = create_tm_param_func
         self.length = length
-        self._delta_e_func = delta_e_func
+        self._delta_e_func = delta_e_func if tm_type == TMTypes.MAIN else None # entrance/exit functions (e.g Edges or Couplerkicks) do not change beam energy.
+        self.tm_type = tm_type
 
         self._map = None
 
     def get_delta_e(self, delta_length=0.0):
-        return self._delta_e_func(delta_length=delta_length, total_length=self.length)
+        if self._delta_e_func:
+            return self._delta_e_func(delta_length=delta_length, total_length=self.length)
+        else:
+            return 0.0
 
     @classmethod
     def create(cls, main_tm_params_func, delta_e_func, length, entrance_tm_params_func=None, exit_tm_params_func=None, tm_type: TMTypes = TMTypes.MAIN):
@@ -51,7 +54,7 @@ class Transformation(ABC):
                 raise NotImplementedError(f"{'entrance' if tm_type == TMTypes.ENTRANCE else 'exit'} function is not set in {cls.__class__.__name__}'s __init__")
         except AttributeError:
             raise NotImplementedError(f"The specific element have to implement the function {tm_params_func.__name__}.")
-        return cls(tm_params_func, delta_e_func, length)
+        return cls(tm_params_func, delta_e_func, length, tm_type)
 
     @property
     def map(self):

@@ -61,11 +61,12 @@ class OpticElement:
     @staticmethod
     def _create_tms(element: Element, tm: Type[Transformation]) -> Dict[TMTypes, Type[Transformation]]:
         tms = []
-
-        tms.append(tm.create(element, TMTypes.MAIN))
         if element.has_edge:
             tms.append(tm.create(element, TMTypes.ENTRANCE))
+            tms.append(tm.create(element, TMTypes.MAIN))
             tms.append(tm.create(element, TMTypes.EXIT))
+        else:
+            tms.append(tm.create(element, TMTypes.MAIN))
         return tms
 
     @classmethod

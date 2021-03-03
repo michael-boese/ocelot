@@ -121,9 +121,11 @@ def trace_obj(lattice, obj, nPoints=None):
     if nPoints is None:
         obj_list = [obj]
         for e in lattice.sequence:
-            obj = e.dot_tms(obj)
-            obj.id = e.id
-            obj_list.append(obj)
+            #obj = e.dot_tms(obj)
+            for tm in e._tms:
+                obj = tm * obj
+                obj.id = e.id
+                obj_list.append(obj)
     else:
         z_array = np.linspace(0, lattice.totalLen, nPoints, endpoint=True)
         obj_list = trace_z(lattice, obj, z_array)
@@ -354,7 +356,7 @@ class Navigator:
                     self.add_physics_proc(ap, elem, elem)
                 elif elem.type == "ellipt":
                     ap = EllipticalAperture(xmax=elem.xmax, ymax=elem.ymax,
-                                      dx=elem.dx, dy=elem.dy)
+                                            dx=elem.dx, dy=elem.dy)
                     self.add_physics_proc(ap, elem, elem)
 
     def check_overjump(self, dz, processes, phys_steps):

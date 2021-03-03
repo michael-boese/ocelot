@@ -39,15 +39,15 @@ def test_first_order_quadrupole(load_ground_truth_data):
 
 
 def test_first_order_sbend_entrance(load_ground_truth_data):
-    first_order_test(SBendAtom(l=0.200330283531, angle=-0.099484, e1=0.0, e2=-0.099484, tilt=0.0, fint=0.0, eid='BL.48I.I1'), 'SBend_E1', load_ground_truth_data, tm_type=TMTypes.ENTRANCE)
+    first_order_test(SBendAtom(l=0.200330283531, angle=-0.1109740393, e1=-0.05548702, e2=-0.05548702, tilt=0.0, fint=0.0, eid='BL.48I.I1'), 'SBend_E1', load_ground_truth_data, tm_type=TMTypes.ENTRANCE)
 
 
 def test_first_order_sbend_main(load_ground_truth_data):
-    first_order_test(SBendAtom(l=0.200330283531, angle=-0.099484, e1=0.0, e2=-0.099484, tilt=0.0, fint=0.0, eid='BL.48I.I1'), 'SBend', load_ground_truth_data)
+    first_order_test(SBendAtom(l=0.200330283531, angle=-0.1109740393, e1=-0.05548702, e2=-0.05548702, tilt=0.0, fint=0.0, eid='BL.48I.I1'), 'SBend', load_ground_truth_data)
 
 
 def test_first_order_sbend_exit(load_ground_truth_data):
-    first_order_test(SBendAtom(l=0.200330283531, angle=-0.099484, e1=0.0, e2=-0.099484, tilt=0.0, fint=0.0, eid='BL.48I.I1'), 'SBend_E2', load_ground_truth_data, tm_type=TMTypes.EXIT)
+    first_order_test(SBendAtom(l=0.200330283531, angle=-0.1109740393, e1=-0.05548702, e2=-0.05548702, tilt=0.0, fint=0.0, eid='BL.48I.I1'), 'SBend_E2', load_ground_truth_data, tm_type=TMTypes.EXIT)
 
 
 def test_first_order_undulator(load_ground_truth_data):

@@ -15,8 +15,8 @@ class TransferMap(Transformation):
     TransferMap is a basic linear transfer map for all elements.
     """
 
-    def __init__(self, create_tm_param_func, delta_e_func, length) -> None:
-        super().__init__(create_tm_param_func, delta_e_func, length)
+    def __init__(self, create_tm_param_func, delta_e_func, length: float, tm_type: TMTypes) -> None:
+        super().__init__(create_tm_param_func, delta_e_func, length, tm_type)
 
     @classmethod
     def create(self, element: Element, tm_type: TMTypes = TMTypes.MAIN):
@@ -56,9 +56,9 @@ class TransferMap(Transformation):
         rparticles[:] = a[:]
         return rparticles
 
-    def multiply_with_tm(self, tm: 'TransferMap') -> 'TransferMap':
+    def multiply_with_tm(self, tm: 'TransferMap', length) -> 'TransferMap':
         return TransferMap(create_tm_param_func=lambda energy, delta_length: self.get_params(energy, delta_length) * tm.get_params(energy, delta_length),
-                           length=self.length + tm.length)
+                           length=length)
 
     def __mul__(self, m):
         """
@@ -70,7 +70,8 @@ class TransferMap(Transformation):
         B = (E - R)*dX
         """
         try:
-            return m.multiply_with_tm(self)
+            length = self.length if self.tm_type == TMTypes.MAIN else 0.0
+            return m.multiply_with_tm(self, length)
         except AttributeError as e:
             _logger.error(
                 " TransferMap.__mul__: unknown object in transfer map multiplication: " + str(m.__class__.__name__))
