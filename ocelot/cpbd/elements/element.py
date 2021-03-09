@@ -52,10 +52,9 @@ class Element(TMParamsFactory):
             R = uni_matrix(delta_length, k1, hx=hx, sum_tilts=0, energy=energy)
         else:
             R = uni_matrix(self.l, k1, hx=hx, sum_tilts=0, energy=energy)
-        R = np.dot(np.dot(rot_mtx(-self.tilt), R), rot_mtx(self.tilt))
         B = self._default_B(R)
 
-        return FirstOrderParams(R, B)
+        return FirstOrderParams(R, B, self.tilt)
 
     def create_second_order_main_params(self, energy: float, delta_length: float = 0.0) -> SecondOrderParams:
         T = t_nnn(delta_length if delta_length else self.l, 0. if self.l == 0 else self.angle / self.l, self.k1, self.k2,

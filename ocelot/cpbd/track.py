@@ -417,13 +417,13 @@ def track(lattice, p_array, navi, print_progress=True, calc_tws=True, bounds=Non
     tws_track = [tw0]
     L = 0.
 
-    while np.abs(navi.z0 - lattice.totalLen) > 1e-10:
-        if navi.kill_process:
-            _logger.info("Killing tracking ... ")
-            return tws_track, p_array
-
-        dz, proc_list, phys_steps = navi.get_next()
-        tracking_step(lat=lattice, particle_list=p_array, dz=dz, navi=navi)
+    for t_maps, dz, proc_list, phys_steps in navi.get_next_step():
+        for tm in t_maps:
+            start = time()
+            tm.apply(p_array)
+            _logger.debug(" tracking_step -> tm.class: " + tm.__class__.__name__  + "  l= "+ str(tm.length))
+            _logger.debug(" tracking_step -> tm.apply: time exec = " + str(time() - start) + "  sec")
+        
         #part = p_array[0]
         for p, z_step in zip(proc_list, phys_steps):
             p.z0 = navi.z0

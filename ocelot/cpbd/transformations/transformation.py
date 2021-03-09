@@ -12,16 +12,19 @@ _logger = logging.getLogger(__name__)
 
 
 class TMTypes(enum.Enum):
-    ENTRANCE = 1
-    EXIT = 2
-    MAIN = 3
+    ROT_ENTRANCE = 1
+    ROT_EXIT = 2
+    ENTRANCE = 3
+    EXIT = 4
+    MAIN = 5
+
 
 class Transformation(ABC):
     """
     TransferMap is a basic class of all TransferMaps and defines the Interface for them.
     """
 
-    def __init__(self, create_tm_param_func, delta_e_func, length: float, tm_type: TMTypes) -> None:
+    def __init__(self, create_tm_param_func, delta_e_func, tm_type: TMTypes, length: float, delta_length: float = 0.0) -> None:
         """[summary]
 
         Args:
@@ -29,20 +32,21 @@ class Transformation(ABC):
             length (float): total length to which the transformation is applied.
         """
         self.create_tm_param_func = create_tm_param_func
-        self.length = length
-        self._delta_e_func = delta_e_func if tm_type == TMTypes.MAIN else None # entrance/exit functions (e.g Edges or Couplerkicks) do not change beam energy.
+        self.length = length if tm_type == TMTypes.MAIN else 0.0  # entrance/exit functions (e.g Edges or Couplerkicks) do not have a length.
+        self.delta_length = delta_length
+        self._delta_e_func = delta_e_func if tm_type == TMTypes.MAIN else None  # entrance/exit functions (e.g Edges or Couplerkicks) do not change beam energy.
         self.tm_type = tm_type
 
         self._map = None
 
-    def get_delta_e(self, delta_length=0.0):
+    def get_delta_e(self):
         if self._delta_e_func:
-            return self._delta_e_func(delta_length=delta_length, total_length=self.length)
+            return self._delta_e_func(delta_length=self.delta_length, total_length=self.length)
         else:
             return 0.0
 
     @classmethod
-    def create(cls, main_tm_params_func, delta_e_func, length, entrance_tm_params_func=None, exit_tm_params_func=None, tm_type: TMTypes = TMTypes.MAIN):
+    def create(cls, main_tm_params_func, delta_e_func, length, delta_length=0.0, entrance_tm_params_func=None, exit_tm_params_func=None, tm_type: TMTypes = TMTypes.MAIN):
         try:
             if tm_type == TMTypes.ENTRANCE:
                 tm_params_func = entrance_tm_params_func
@@ -54,22 +58,15 @@ class Transformation(ABC):
                 raise NotImplementedError(f"{'entrance' if tm_type == TMTypes.ENTRANCE else 'exit'} function is not set in {cls.__class__.__name__}'s __init__")
         except AttributeError:
             raise NotImplementedError(f"The specific element have to implement the function {tm_params_func.__name__}.")
-        return cls(tm_params_func, delta_e_func, length, tm_type)
-
-    @property
-    def map(self):
-        if not self._map:
-            self._map = self.map_function()
-        return self._map
-
-    @map.setter
-    def map(self, func):
-        self._map = func
+        if delta_length > length:
+            _logger.warning("delta_l > length of element. Set delta_l == length of element.")
+            delta_length = length
+        return cls(create_tm_param_func=tm_params_func, delta_e_func=delta_e_func, tm_type=tm_type, length=length, delta_length=delta_length)
 
     # twiss and tms using the same parameter
-    @functools.lru_cache(maxsize=3)
-    def get_params(self, energy: float, delta_length: float = 0.0):
-        return self.create_tm_param_func(energy, delta_length)
+    # @functools.lru_cache(maxsize=3)
+    def get_params(self, energy: float):
+        return self.create_tm_param_func(energy, self.delta_length)
 
     @abstractmethod
     def map_function(self, delta_length: float = None, length: float = None):
@@ -95,12 +92,12 @@ class Transformation(ABC):
         """
         pass
 
-    @abstractmethod
-    def __call__(self, delta_length: float) -> 'TransferMap':
-        """[summary]
-        :param delta_length: delta length of the element
-        :type delta_length: float        
-        :return: a new TransferMap for delta_length
-        :rtype: 'TransferMap'
-        """
-        pass
+    # @abstractmethod
+    # def __call__(self, delta_length: float) -> 'TransferMap':
+    #     """[summary]
+    #     :param delta_length: delta length of the element
+    #     :type delta_length: float
+    #     :return: a new TransferMap for delta_length
+    #     :rtype: 'TransferMap'
+    #     """
+    #     pass

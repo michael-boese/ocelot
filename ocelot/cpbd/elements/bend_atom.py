@@ -72,15 +72,13 @@ class BendAtom(Element):
 
     def create_first_order_entrance_params(self, energy: float, delta_length: float = 0.0) -> FirstOrderParams:
         R = self._R_edge(self.fint, self.e1)
-        R = np.dot(np.dot(rot_mtx(-self.tilt), R), rot_mtx(self.tilt))
         B = self._default_B(R)
-        return FirstOrderParams(R, B)
+        return FirstOrderParams(R, B, self.tilt)
 
     def create_first_order_exit_params(self, energy: float, delta_length: float = 0.0) -> FirstOrderParams:
         R = self._R_edge(self.fintx, self.e2)
-        R = np.dot(np.dot(rot_mtx(-self.tilt), R), rot_mtx(self.tilt))
         B = self._default_B(R)
-        return FirstOrderParams(R, B)
+        return FirstOrderParams(R, B, self.tilt)
 
     def create_second_order_entrance_params(self, energy: float, delta_length: float = 0.0) -> SecondOrderParams:
         first_order_params = self.create_first_order_entrance_params(energy)

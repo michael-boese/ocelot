@@ -125,7 +125,10 @@ class MagneticLattice:
         if method is None:
             method = {'global': TransferMap}
         self.sequence = list(flatten(sequence))
-        self.method = method
+        if isinstance(method, dict):
+            self.method = method
+        else:
+            self.method = method.params
 
         self.sequence = self.get_sequence_part(start, stop)
 
@@ -163,7 +166,7 @@ class MagneticLattice:
     def update_transfer_maps(self):
         self.totalLen = 0
         for i, element in enumerate(self.sequence):
-            #TODO: This belongs to the Element Undulator
+            # TODO: This belongs to the Element Undulator
             if element.__class__ == Undulator:
                 if element.field_file is not None:
                     element.l = element.field_map.l * element.field_map.field_file_rep
@@ -178,7 +181,6 @@ class MagneticLattice:
                 tm_class_type = self.method.get('global')
                 if tm_class_type:
                     element.set_tm(tm_class_type)
-
 
             _logger.debug(f"update: {','.join([tm.__class__.__name__ for tm in element.tms])}")
         return self

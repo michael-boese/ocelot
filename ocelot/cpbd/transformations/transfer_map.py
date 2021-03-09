@@ -15,26 +15,29 @@ class TransferMap(Transformation):
     TransferMap is a basic linear transfer map for all elements.
     """
 
-    def __init__(self, create_tm_param_func, delta_e_func, length: float, tm_type: TMTypes) -> None:
-        super().__init__(create_tm_param_func, delta_e_func, length, tm_type)
+    def __init__(self, create_tm_param_func, delta_e_func, tm_type: TMTypes, length: float, delta_length: float = 0.0) -> None:
+        super().__init__(create_tm_param_func, delta_e_func, tm_type, length, delta_length)
 
     @classmethod
-    def create(self, element: Element, tm_type: TMTypes = TMTypes.MAIN):
+    def create(self, element: Element, tm_type: TMTypes = TMTypes.MAIN, delta_l=0.0):
+        if delta_l > element.l:
+            _logger.warning("delta_l > length of element. Set delta_l == length of element.")
+            delta_l = element.l
         return super().create(entrance_tm_params_func=element.create_first_order_entrance_params,
                               delta_e_func=element.create_delta_e,
                               main_tm_params_func=element.create_first_order_main_params,
                               exit_tm_params_func=element.create_first_order_exit_params,
-                              tm_type=tm_type, length=element.l)
+                              tm_type=tm_type, length=element.l, delta_length=delta_l)
 
-    @property
-    def map(self):
-        if not self._map:
-            self._map = self.map_function()
-        return self._map
+    # @property
+    # def map(self):
+    #     if not self._map:
+    #         self._map = self.map_function()
+    #     return self._map
 
-    @map.setter
-    def map(self, func):
-        self._map = func
+    # @map.setter
+    # def map(self, func):
+    #     self._map = func
 
     def map_function(self, delta_length=None, length=None):
         """
@@ -52,7 +55,7 @@ class TransferMap(Transformation):
         :return: Returns the modified rparticles 
         """
         params = self.get_params(energy)
-        a = np.add(np.dot(params.R(energy), rparticles), params.B(energy))
+        a = np.add(np.dot(params.get_rotated_R(), rparticles), params.B)
         rparticles[:] = a[:]
         return rparticles
 
@@ -70,8 +73,7 @@ class TransferMap(Transformation):
         B = (E - R)*dX
         """
         try:
-            length = self.length if self.tm_type == TMTypes.MAIN else 0.0
-            return m.multiply_with_tm(self, length)
+            return m.multiply_with_tm(self, self.length)
         except AttributeError as e:
             _logger.error(
                 " TransferMap.__mul__: unknown object in transfer map multiplication: " + str(m.__class__.__name__))
@@ -84,8 +86,10 @@ class TransferMap(Transformation):
         :return: None
         """
         if prcl_series.__class__ == ParticleArray:
-            self.map(prcl_series.rparticles, energy=prcl_series.E)
-            prcl_series.E += self.delta_e
+            self.map_function(self.length, self.delta_length)(prcl_series.rparticles, energy=prcl_series.E)
+            #self.map(prcl_series.rparticles, energy=prcl_series.E)
+            prcl_series.E += self.get_delta_e()
+            #prcl_series.E += self.delta_e
             prcl_series.s += self.length
 
         elif prcl_series.__class__ == Particle:
@@ -119,15 +123,15 @@ class TransferMap(Transformation):
             raise Exception(
                 " TransferMap.apply(): Unknown type of Particle_series: " + str(prcl_series.__class__.__name))
 
-    #TODO: Refactor old style
-    def __call__(self, delta_length):
-        m = copy(self)
-        m.R = lambda energy: m.R_z(delta_length, energy)
-        m.B = lambda energy: m.B_z(delta_length, energy)
-        m.delta_e = m.delta_e_z(delta_length)
-        m.map = m.map_function(delta_length=delta_length, length=self.length)
-        m.length = delta_length
-        return m
+    # TODO: Refactor old style
+    # def __call__(self, delta_length):
+    #     m = copy(self)
+    #     m.R = lambda energy: m.R_z(delta_length, energy)
+    #     m.B = lambda energy: m.B_z(delta_length, energy)
+    #     m.delta_e = m.delta_e_z(delta_length)
+    #     m.map = m.map_function(delta_length=delta_length, length=self.length)
+    #     m.length = delta_length
+    #     return m
 
     @classmethod
     def create_from_element(cls, element, params=None):

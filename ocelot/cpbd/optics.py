@@ -442,6 +442,17 @@ class Navigator:
                 self.process_table.kick_proc_list.remove(p)
                 self.process_table.proc_list.remove(p)
 
+    def get_next_step(self):
+        while np.abs(self.z0 - self.lat.totalLen) > 1e-10:
+            if self.kill_process:
+                _logger.info("Killing tracking ... ")
+                return
+            dz, proc_list, phys_steps = self.get_next()
+            if self.z0 + dz > self.lat.totalLen:
+                dz = self.lat.totalLen - self.z0
+
+            yield get_map(self.lat, dz, self), dz, proc_list, phys_steps
+
     def get_next(self):
 
         proc_list = self.get_proc_list()
@@ -500,7 +511,8 @@ def get_map(lattice, dz, navi):
     while z1 + 1e-10 > L:
 
         dl = L - navi.z0
-        TM.append(elem.transfer_map(dl))
+        # TM.append(elem.transfer_map(dl))
+        TM += elem.get_section_tms(start_l=navi.z0 - navi.sum_lengths, delta_l=dl)
 
         navi.z0 = L
         dz -= dl
@@ -513,6 +525,7 @@ def get_map(lattice, dz, navi):
         # if i in navi.proc_kick_elems:
         #    break
     if abs(dz) > 1e-10:
+        TM += elem.get_section_tms(start_l=navi.z0 - navi.sum_lengths, delta_l=dz)
         TM.append(elem.transfer_map(dz))
     navi.z0 += dz
     navi.sum_lengths = L - elem.l

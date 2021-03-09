@@ -168,17 +168,17 @@ class CavityAtom(Element):
     def create_first_order_main_params(self, energy: float, delta_length: float) -> FirstOrderParams:
         R = self._R_main_matrix(energy=energy, length=delta_length if delta_length != 0 else self.l)
         B = self._default_B(R)
-        return FirstOrderParams(R, B)
+        return FirstOrderParams(R, B, self.tilt)
 
     def create_first_order_entrance_params(self, energy: float, delta_length: float) -> FirstOrderParams:
         R = self._R_edge_matrix(energy=energy, vxx=self.vxx_up, vxy=self.vxy_up)
         B = self._default_B(R)
-        return FirstOrderParams(R, B)
+        return FirstOrderParams(R, B, self.tilt)
 
     def create_first_order_exit_params(self, energy: float, delta_length: float) -> FirstOrderParams:
         R = self._R_edge_matrix(energy=energy, vxx=self.vxx_down, vxy=self.vxy_down)
         B = self._default_B(R)
-        return FirstOrderParams(R, B)
+        return FirstOrderParams(R, B, self.tilt)
 
     def create_delta_e(self, total_length, delta_length=0.0) -> float:
         if delta_length != 0.0:

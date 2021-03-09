@@ -37,4 +37,4 @@ class RBendAtom(BendAtom):
     def create_first_order_main_params(self, energy: float, delta_length: float = 0.0) -> FirstOrderParams:
         R = uni_matrix(delta_length if delta_length != 0.0 else self.l, 0, hx=0, sum_tilts=0, energy=energy)
         B = self._default_B(R)
-        return FirstOrderParams(R, B)
+        return FirstOrderParams(R, B, self.tilt)
