@@ -31,7 +31,7 @@ class SecondTM(TransferMap):
 
     def calculate_Tb(self, energy) -> np.ndarray:
         """
-        Calculates the Tb matrix which is needed to claculate the transfromation matrix.
+        Calculates the Tb matrix which is needed to calculate the transfromation matrix.
         @return: Tb matrix
         """
         Tb = np.copy(self.T_tilt(energy))

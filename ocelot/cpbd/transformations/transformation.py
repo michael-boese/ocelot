@@ -64,7 +64,7 @@ class Transformation(ABC):
         return cls(create_tm_param_func=tm_params_func, delta_e_func=delta_e_func, tm_type=tm_type, length=length, delta_length=delta_length)
 
     # twiss and tms using the same parameter
-    # @functools.lru_cache(maxsize=3)
+#    @functools.lru_cache(maxsize=3)
     def get_params(self, energy: float):
         return self.create_tm_param_func(energy, self.delta_length)
 

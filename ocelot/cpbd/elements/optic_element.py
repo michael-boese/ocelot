@@ -74,7 +74,7 @@ class OpticElement:
         #tms = [TMTypes.ROT_ENTRANCE]
         tm_list = []
         total_length = self.element.l
-        if start_l == 0.0 and self.element.has_edge:
+        if start_l < 1e-10 and self.element.has_edge:
             tm = self.get_tm(TMTypes.ENTRANCE)
             tm_list.append(copy(tm))
         if (start_l + delta_l > total_length or np.isclose(start_l + delta_l, total_length)):

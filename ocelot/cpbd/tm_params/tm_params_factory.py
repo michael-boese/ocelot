@@ -26,6 +26,16 @@ class TMParamsFactory:
     def create_first_order_exit_params(self, energy: float, delta_length: float) -> FirstOrderParams:
         raise NotImplementedError(self.__not_impl_error_message(self.create_first_order_exit_params.__name__))
 
+    # First Order
+    def create_cavity_main_params(self, energy: float, delta_length: float) -> FirstOrderParams:
+        raise NotImplementedError(self.__not_impl_error_message(self.create_first_order_main_params.__name__))
+
+    def create_cavity_entrance_params(self, energy: float, delta_length: float) -> FirstOrderParams:
+        raise NotImplementedError(self.__not_impl_error_message(self.create_first_order_entrance_params.__name__))
+
+    def create_cavity_exit_params(self, energy: float, delta_length: float) -> FirstOrderParams:
+        raise NotImplementedError(self.__not_impl_error_message(self.create_first_order_exit_params.__name__))
+
     # Second Order
     def create_second_order_main_params(self, energy: float, delta_length: float) -> SecondOrderParams:
         raise NotImplementedError(self.__not_impl_error_message(self.create_second_order_main_params.__name__))
@@ -35,3 +45,4 @@ class TMParamsFactory:
 
     def create_second_order_exit_params(self, energy: float, delta_length: float) -> SecondOrderParams:
         raise NotImplementedError(self.__not_impl_error_message(self.create_second_order_exit_params.__name__))
+

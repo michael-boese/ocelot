@@ -1,6 +1,7 @@
 import numpy as np
 from ocelot.cpbd.tm_params.tm_params import TMParams
 from ocelot.cpbd.r_matrix import rot_mtx
+import functools
 
 class FirstOrderParams(TMParams):
     def __init__(self, R, B, tilt) -> None:
@@ -9,6 +10,8 @@ class FirstOrderParams(TMParams):
         self.B = B
         self.tilt = tilt
 
+
+    @functools.lru_cache(maxsize=3)
     def get_rotated_R(self):
         return np.dot(np.dot(rot_mtx(-self.tilt), self.R), rot_mtx(self.tilt))
 

@@ -20,9 +20,6 @@ class TransferMap(Transformation):
 
     @classmethod
     def create(self, element: Element, tm_type: TMTypes = TMTypes.MAIN, delta_l=0.0):
-        if delta_l > element.l:
-            _logger.warning("delta_l > length of element. Set delta_l == length of element.")
-            delta_l = element.l
         return super().create(entrance_tm_params_func=element.create_first_order_entrance_params,
                               delta_e_func=element.create_delta_e,
                               main_tm_params_func=element.create_first_order_main_params,

@@ -526,7 +526,7 @@ def get_map(lattice, dz, navi):
         #    break
     if abs(dz) > 1e-10:
         TM += elem.get_section_tms(start_l=navi.z0 - navi.sum_lengths, delta_l=dz)
-        TM.append(elem.transfer_map(dz))
+        # TM.append(elem.transfer_map(dz))
     navi.z0 += dz
     navi.sum_lengths = L - elem.l
     navi.n_elem = i
