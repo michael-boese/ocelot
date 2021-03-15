@@ -19,11 +19,11 @@ class TransferMap(Transformation):
         super().__init__(create_tm_param_func, delta_e_func, tm_type, length, delta_length)
 
     @classmethod
-    def create(self, element: Element, tm_type: TMTypes = TMTypes.MAIN, delta_l=0.0):
-        return super().create(entrance_tm_params_func=element.create_first_order_entrance_params,
+    def from_element(cls, element: Element, tm_type: TMTypes = TMTypes.MAIN, delta_l=0.0):
+        return cls.create(entrance_tm_params_func=element.create_first_order_entrance_params if element.has_edge else None,
                               delta_e_func=element.create_delta_e,
                               main_tm_params_func=element.create_first_order_main_params,
-                              exit_tm_params_func=element.create_first_order_exit_params,
+                              exit_tm_params_func=element.create_first_order_exit_params if element.has_edge else None,
                               tm_type=tm_type, length=element.l, delta_length=delta_l)
 
     # @property

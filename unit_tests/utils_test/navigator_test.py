@@ -76,6 +76,22 @@ def test_get_maps_Drift_lat():
     get_maps_from_single_element_lat_test(p_array_init, drift, method)
 
 
+def test_get_maps_Cavity_lat():
+    method = MethodTM()
+
+    # for second order tracking we have to choose SecondTM
+    method.global_method = CavityTM
+
+    # for first order tracking uncomment next line
+    # method.global_method = TransferMap
+
+    p_array_init = load_particle_array("unit_tests/test_data/init_beam.npz")
+
+    cavity = Cavity(l=1.0377, v=0.01815975, freq=1.3e9, phi=0.0, eid='C.A1.1.1.I1')
+
+    get_maps_from_single_element_lat_test(p_array_init, cavity, method)
+
+
 def test_get_maps_Marker_lat():
     method = MethodTM()
 
@@ -110,6 +126,35 @@ def test_plot():
     plt.show()
     assert False
 
+def test_get_maps_two_cavity_two_sbend_lat():
+    method = MethodTM()
+
+    # for second order tracking we have to choose SecondTM
+    method.global_method = TransferMap
+
+    # for first order tracking uncomment next line
+    # method.global_method = TransferMap
+
+    p_array_init = load_particle_array("unit_tests/test_data/init_beam.npz")
+
+    new_cell = [D_21, C_A1_1_8_I1, D_27, C3_AH1_1_4_I1, D_45, BL_48I_I1, D_46, BL_48II_I1, D_47]
+    lat_t = MagneticLattice(new_cell, start=None, stop=None, method=method)
+
+    navi = Navigator(lat_t)
+    ground_truth_filepaths = [p for p in Path('unit_tests/test_data').glob("**/2Cavity_2SBend_*.npz")]
+    ground_truth_filepaths_sorted_by_num = sorted(ground_truth_filepaths, key=lambda s: int(s.stem.split('_')[-1]))
+    p_array = deepcopy(p_array_init)
+    i = 0
+    for tms, _, _, _ in navi.get_next_step():
+        for t_map in tms:
+            print(f"tm class type: {t_map.__class__.__name__} tmtype: {t_map.tm_type}")
+            t_map.apply(p_array)
+            data_name = ground_truth_filepaths_sorted_by_num[i]
+            p_array_ground_truth = load_particle_array(data_name)
+            compare_p_array(p_array, p_array_ground_truth)
+            i += 1
+
+
 def test_maps_of_fel():
     method = MethodTM()
 
@@ -134,52 +179,19 @@ def test_maps_of_fel():
     ground_truth_filepaths = [p for p in Path('unit_tests/test_data').glob("**/ground_truth_output_*.npz")]
     ground_truth_filepaths_sorted_by_num = sorted(ground_truth_filepaths, key=lambda s: int(s.stem.split('_')[-1]))
 
-
     p_array = deepcopy(p_array_init)
     i = 0
     gt_i = 0
+    i = 0
     for tms, _, _, _ in navi.get_next_step():
-        name = lat_t.sequence[i].__class__.__name__
-        print(name)
-        # if name == "Cavity":
-        #     assert len(tms) == 3
-        #     tms[0].apply(p_array)
-        #     data_name = f"unit_tests/test_data/ground_truth_output_CouplerKick_{gt_i}.npz"
-        #     p_array_ground_truth = load_particle_array(data_name)
-        #     compare_p_array(p_array, p_array_ground_truth)
-        #     tms[1].apply(p_array)
-        #     data_name = f"unit_tests/test_data/ground_truth_output_{name}_{gt_i+1}.npz"
-        #     p_array_ground_truth = load_particle_array(data_name)
-        #     compare_p_array(p_array, p_array_ground_truth)
-        #     tms[2].apply(p_array)
-        #     data_name = f"unit_tests/test_data/ground_truth_output_CouplerKick_{gt_i+2}.npz"
-        #     p_array_ground_truth = load_particle_array(data_name)
-        #     compare_p_array(p_array, p_array_ground_truth)
-        #     gt_i += 2
-
-        # if name in ["Bend", "SBend", "RBend"]:
-        #     assert len(tms) == 3
-        #     tms[0].apply(p_array)
-        #     data_name = f"unit_tests/test_data/ground_truth_output_Edge_{gt_i}.npz"
-        #     p_array_ground_truth = load_particle_array(data_name)
-        #     compare_p_array(p_array, p_array_ground_truth)
-        #     tms[1].apply(p_array)
-        #     data_name = f"unit_tests/test_data/ground_truth_output_{name}_{gt_i+1}.npz"
-        #     p_array_ground_truth = load_particle_array(data_name)
-        #     compare_p_array(p_array, p_array_ground_truth)
-        #     tms[2].apply(p_array)
-        #     data_name = f"unit_tests/test_data/ground_truth_output_Edge_{gt_i+2}.npz"
-        #     p_array_ground_truth = load_particle_array(data_name)
-        #     compare_p_array(p_array, p_array_ground_truth)
-        #     gt_i += 2
-
         for t_map in tms:
+            print(f"tm class type: {t_map.__class__.__name__} tmtype: {t_map.tm_type}")
             t_map.apply(p_array)
-            data_name = ground_truth_filepaths_sorted_by_num[gt_i]
+            data_name = ground_truth_filepaths_sorted_by_num[i]
             p_array_ground_truth = load_particle_array(data_name)
             compare_p_array(p_array, p_array_ground_truth)
             i += 1
-            gt_i += 1
+            print(f"Next Element: {navi.lat.sequence[i].__class__.__name__}")
 
     # tms = (tms for tms, _, _, _ in navi.get_next_step())
     # for i, t_map in enumerate((tm for sub_tms in tms for tm in sub_tms)):

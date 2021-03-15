@@ -1,27 +1,33 @@
-from copy import copy
-
 import numpy as np
 
+from ocelot.cpbd.transformations.transfer_map import TransferMap, TMTypes
+from ocelot.cpbd.transformations.transformation import Transformation
+from ocelot.cpbd.elements.element import Element
 from ocelot.cpbd.high_order import m_e_GeV
 from ocelot.common.globals import speed_of_light
-from ocelot.cpbd.transformations.transformation import Transformation
 
 
-class CavityTM(Transformation):
-    def __init__(self, v=0, freq=0., phi=0.):
-        super().__init__()
-        self.v = v
-        self.freq = freq
-        self.phi = phi
-        self.vx_up = 0.
-        self.vy_up = 0.
-        self.vx_down = 0.
-        self.vy_down = 0.
-        phase_term = np.cos(self.phi * np.pi / 180.)
-        self.delta_e_z = lambda z: phase_term * self.v * z / self.length if self.length != 0 else phase_term * self.v
-        self.delta_e = self.v * np.cos(self.phi * np.pi / 180.)
+class CavityTM(TransferMap):
+    def __init__(self, create_tm_param_func, delta_e_func, tm_type: TMTypes, length: float, delta_length: float) -> None:
+        super().__init__(create_tm_param_func, delta_e_func, tm_type, length, delta_length=delta_length)
 
-    def map4cav(self, X, E, V, freq, phi, z=0):
+    @classmethod
+    def from_element(cls, element: Element, tm_type: TMTypes = TMTypes.MAIN, delta_l=0.0):
+        return cls.create(entrance_tm_params_func=element.create_cavity_tm_entrance_params,
+                                    delta_e_func=element.create_delta_e,
+                                    main_tm_params_func=element.create_cavity_tm_main_params,
+                                    exit_tm_params_func=element.create_cavity_tm_exit_params,
+                                    tm_type=tm_type, length=element.l, delta_length=delta_l)
+
+    def map4cav(self, X, E, delta_length, length):
+        params = self.get_params(E)
+        if delta_length:
+            V = params.v * delta_length / length if length != 0 else params.v
+            z = delta_length
+        else:
+            V = params.v
+            z = length
+
         beta0 = 1
         igamma2 = 0
         g0 = 1e10
@@ -30,7 +36,7 @@ class CavityTM(Transformation):
             igamma2 = 1. / (g0 * g0)
             beta0 = np.sqrt(1. - igamma2)
 
-        phi = phi * np.pi / 180.
+        phi = params.phi * np.pi / 180.
 
         X4 = np.copy(X[4])
         X5 = np.copy(X[5])
@@ -41,7 +47,7 @@ class CavityTM(Transformation):
         T556 = 0.
         T555 = 0.
         if E + delta_e > 0:
-            k = 2. * np.pi * freq / speed_of_light
+            k = 2. * np.pi * params.freq / speed_of_light
             E1 = E + delta_e
             g1 = E1 / m_e_GeV
             beta1 = np.sqrt(1. - 1. / (g1 * g1))
@@ -63,13 +69,8 @@ class CavityTM(Transformation):
 
         return X
 
-    def map_function(self, delta_length=None, length=None):
-        if delta_length:
-            v = self.v * delta_length / length if length != 0 else self.v
+    def map_function(self, delta_length: float = None, length: float = None):
+        if self.tm_type == TMTypes.MAIN:
+            return lambda X, energy: self.map4cav(X, energy, delta_length, length)
         else:
-            v = self.v
-        return lambda X, energy: self.map4cav(X, energy, v, self.freq, self.phi, delta_length if delta_length else self.length)
-
-    @classmethod
-    def create_from_element(cls, element, params=None):
-        return cls(v=element.v, freq=element.freq, phi=element.phi)
+            return lambda X, energy: self.mul_p_array(X, energy=energy)

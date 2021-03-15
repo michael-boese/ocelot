@@ -28,18 +28,18 @@ lat_t = MagneticLattice(cell, start=start_sim, stop=None, method=method)
 
 start = Marker()
 # c = [STSEC_23_I1, STSUB_23_I1, GUN_23_I1, D_1, SOLB_23_I1, D_2, CKX_23_I1,
-#         CKY_23_I1, D_3, BPMG_24_I1, D_4, SCRN_24_I1, FCUP_24_I1, D_5, ENSUB_24_I1,
-#         STSUB_24_I1, D_6, CKX_24_I1, CKY_24_I1, D_7, TORA_25_I1, D_8, SCRN_25I_I1,
-#         FCUP_25I_I1, D_9, BPMG_25I_I1, D_10, DCM_25_I1, D_11, CKX_25_I1, CKY_25_I1,
-#         D_12, START_25_I1, D_13, STAC_26_I1, D_14, C_A1_1_1_I1, D_15, C_A1_1_2_I1,
-#         D_16, C_A1_1_3_I1, D_17, C_A1_1_4_I1, D_18, C_A1_1_5_I1, D_19, C_A1_1_6_I1,
-#         D_20, C_A1_1_7_I1, D_21, C_A1_1_8_I1, D_22, stop_A1, Q_37_I1, CX_37_I1, CY_37_I1,
-#         D_23, BPMC_38I_I1, D_24, ENAC_38_I1, STAC_38_I1, D_25, BPMR_38II_I1, D_26,
-#         Q_38_I1, CX_39_I1, CY_39_I1, D_27, C3_AH1_1_1_I1, D_28, C3_AH1_1_2_I1, D_29,
-#         C3_AH1_1_3_I1, D_30, C3_AH1_1_4_I1, D_31, C3_AH1_1_5_I1, D_32, C3_AH1_1_6_I1, D_33,
-#         C3_AH1_1_7_I1, D_34, C3_AH1_1_8_I1, D_35, ENAC_44_I1, D_36, END_45_I1, D_37,
-#         TORA_46_I1, D_38, QI_46_I1, D_39, BAM_47_I1, D_40, BPMF_47_I1, D_41,
-#         MPBPMF_47_I1, D_42, DCM_47_I1, D_43, QI_47_I1, D_44, STLAT_47_I1, D_45, BL_48I_I1, D_46, BL_48II_I1, D_47]
+#      CKY_23_I1, D_3, BPMG_24_I1, D_4, SCRN_24_I1, FCUP_24_I1, D_5, ENSUB_24_I1,
+#      STSUB_24_I1, D_6, CKX_24_I1, CKY_24_I1, D_7, TORA_25_I1, D_8, SCRN_25I_I1,
+#      FCUP_25I_I1, D_9, BPMG_25I_I1, D_10, DCM_25_I1, D_11, CKX_25_I1, CKY_25_I1,
+#      D_12, START_25_I1, D_13, STAC_26_I1, D_14, C_A1_1_1_I1, D_15, C_A1_1_2_I1,
+#      D_16, C_A1_1_3_I1, D_17, C_A1_1_4_I1, D_18, C_A1_1_5_I1, D_19, C_A1_1_6_I1,
+#      D_20, C_A1_1_7_I1, D_21, C_A1_1_8_I1, D_22, stop_A1, Q_37_I1, CX_37_I1, CY_37_I1,
+#      D_23, BPMC_38I_I1, D_24, ENAC_38_I1, STAC_38_I1, D_25, BPMR_38II_I1, D_26,
+#      Q_38_I1, CX_39_I1, CY_39_I1, D_27, C3_AH1_1_1_I1, D_28, C3_AH1_1_2_I1, D_29,
+#      C3_AH1_1_3_I1, D_30, C3_AH1_1_4_I1, D_31, C3_AH1_1_5_I1, D_32, C3_AH1_1_6_I1, D_33,
+#      C3_AH1_1_7_I1, D_34, C3_AH1_1_8_I1, D_35, ENAC_44_I1, D_36, END_45_I1, D_37,
+#      TORA_46_I1, D_38, QI_46_I1, D_39, BAM_47_I1, D_40, BPMF_47_I1, D_41,
+#      MPBPMF_47_I1, D_42, DCM_47_I1, D_43, QI_47_I1, D_44, STLAT_47_I1, D_45, BL_48I_I1, D_46, BL_48II_I1, D_47]
 
 # c = [STSEC_23_I1, STSUB_23_I1, GUN_23_I1, D_1, SOLB_23_I1, D_2, CKX_23_I1,
 #      CKY_23_I1, D_3, BPMG_24_I1, D_4, SCRN_24_I1, FCUP_24_I1, D_5, ENSUB_24_I1,
@@ -51,14 +51,59 @@ start = Marker()
 #      TORA_46_I1, D_38, QI_46_I1, D_39, BAM_47_I1, D_40, BPMF_47_I1, D_41,
 #      MPBPMF_47_I1, D_42, DCM_47_I1, D_43, QI_47_I1, D_44, STLAT_47_I1, D_45, BL_48I_I1, D_46, BL_48II_I1, D_47]
 
+
+# c = [STSEC_23_I1, STSUB_23_I1, GUN_23_I1, D_1, SOLB_23_I1, D_2, CKX_23_I1,
+#      CKY_23_I1, D_3, BPMG_24_I1, D_4, SCRN_24_I1, FCUP_24_I1, D_5, ENSUB_24_I1,
+#      STSUB_24_I1, D_6, CKX_24_I1, CKY_24_I1, D_7, TORA_25_I1, D_8, SCRN_25I_I1,
+#      FCUP_25I_I1, D_9, BPMG_25I_I1, D_10, DCM_25_I1, D_11, CKX_25_I1, CKY_25_I1,
+#      D_12, START_25_I1, D_13, STAC_26_I1, D_14, C_A1_1_1_I1, D_15, C_A1_1_2_I1,
+#      D_16, C_A1_1_3_I1, D_17, C_A1_1_4_I1, D_18, C_A1_1_5_I1, D_19, C_A1_1_6_I1,
+#      D_20, C_A1_1_7_I1, D_21, C_A1_1_8_I1] + \
+#     [stop_A1, Q_37_I1, CX_37_I1, CY_37_I1,
+#      D_23, BPMC_38I_I1, D_24, ENAC_38_I1, STAC_38_I1, D_25, BPMR_38II_I1, D_26,
+#      Q_38_I1, CX_39_I1, CY_39_I1] + \
+#     [D_35, ENAC_44_I1, D_36, END_45_I1, D_37,
+#         TORA_46_I1, D_38, QI_46_I1, D_39, BAM_47_I1, D_40, BPMF_47_I1, D_41,
+#         MPBPMF_47_I1, D_42, DCM_47_I1, D_43, QI_47_I1, D_44, STLAT_47_I1, D_45, BL_48I_I1, D_46, BL_48II_I1, D_47]
+
 #c = [D_21, C_A1_1_8_I1, D_45, BL_48I_I1, D_46]
 
 #c = [D_21, C_A1_1_8_I1, D_45, BL_48I_I1, D_33]
 
-#c = [D_21, C_A1_1_8_I1, D_45, BL_73_I1, D_33]
+# c = [C_A1_1_8_I1, D_21, D_22, stop_A1, Q_37_I1, CX_37_I1, CY_37_I1,
+#      D_23, BPMC_38I_I1, D_24, ENAC_38_I1, STAC_38_I1, D_25, BPMR_38II_I1, D_26,
+#      Q_38_I1, CX_39_I1, CY_39_I1,  BL_48I_I1, D_33, BL_48II_I1, D_34]
+
+# c = [C_A1_1_8_I1, D_21, D_22, stop_A1, Q_37_I1,
+#      D_23, D_24, STAC_38_I1, D_25, D_26,
+#      Q_38_I1,  BL_48I_I1, D_33, BL_48II_I1, D_34]
+
+#c = [C_A1_1_8_I1, D_21, D_22, Q_37_I1, D_23, Q_38_I1, D_20, BL_48I_I1, D_33, BL_48II_I1, D_34]
+
+# c = [C_A1_1_8_I1, D_21, CX_37_I1, CY_37_I1,
+#      D_23, BPMC_38I_I1, D_24, ENAC_38_I1, STAC_38_I1, D_25, BPMR_38II_I1, D_26,
+#      Q_38_I1, CX_39_I1, CY_39_I1,  BL_48I_I1, D_33, BL_48II_I1, D_34]
+
+#c = [D_21, C_A1_1_8_I1] + \
+#    [D_27, C3_AH1_1_4_I1] + \
+#    [D_45, BL_48I_I1, D_46, BL_48II_I1, D_47]
 
 #lat_t = MagneticLattice(c, start=None, stop=None, method=method)
+
 navi = Navigator(lat_t)
+
+tw = Twiss()
+tw.beta_x = 2.36088
+tw.beta_y = 2.824
+tw.alpha_x = 1.2206
+tw.alpha_y = -1.35329
+bt = BeamTransform(tws=tw)
+navi.unit_step = 0.5 # ignored in that case, tracking will performs element by element.
+                   # - there is no PhysicsProc along the lattice,
+                   # BeamTransform is aplied only once
+navi.add_physics_proc(bt, OTRC_55_I1, OTRC_55_I1)
+empty = PhysProc()
+navi.add_physics_proc(empty, start_sim, END_119_I1)
 
 p_array = deepcopy(p_array_init)
 start = time.time()

@@ -13,4 +13,4 @@ class Vcor(OpticElement):
     angle - angle of bend in [rad],
     """
     def __init__(self, l=0., angle=0., eid=None, tm=TransferMap):
-        super().__init__(VcorAtom(l=l, angle=angle, eid=eid), tm=tm)
+        super().__init__(VcorAtom(l=l, angle=angle, eid=eid), tm=tm, default_tm=TransferMap)

@@ -9,4 +9,4 @@ class Drift(OpticElement):
     l - length of drift in [m]
     """
     def __init__(self, l=0., eid=None, tm=TransferMap):
-        super().__init__(DriftAtom(l=l, eid=eid), tm=tm)
+        super().__init__(DriftAtom(l=l, eid=eid), tm=tm, default_tm=TransferMap)

@@ -1,13 +1,12 @@
-from ocelot.cpbd.tm_params.second_order_params import SecondOrderParams
-from ocelot.cpbd.tm_params.first_order_params import FirstOrderParams
 import numpy as np
 
-from ocelot.cpbd.tm_params.tm_params_factory import TMParamsFactory
+from ocelot.cpbd.tm_params.second_order_params import SecondOrderParams
+from ocelot.cpbd.tm_params.first_order_params import FirstOrderParams
 from ocelot.cpbd.high_order import t_nnn
 from ocelot.cpbd.r_matrix import rot_mtx, uni_matrix
 
 
-class Element(TMParamsFactory):
+class Element:
     """
     Element is a basic beamline building element
     Accelerator optics elements are subclasses of Element

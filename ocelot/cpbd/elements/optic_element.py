@@ -15,10 +15,10 @@ class OpticElement:
 
     __is_init = False  # needed to disable __getattr__ and __setattr__ until __init__ is executed
 
-    def __init__(self, element: Element, tm: Type[Transformation]) -> None:
+    def __init__(self, element: Element, tm: Type[Transformation], default_tm: Transformation) -> None:
         self.element = element
-        self._tm_class_type = tm
-        self._tms = self._create_tms(self.element, tm)
+        self.default_tm = default_tm
+        self.__init_tms(tm)
 
         self.__is_init = True  # needed to disable __getattr__ and __setattr__ is is executed
 
@@ -42,8 +42,14 @@ class OpticElement:
     def tms(self):
         return self._tms
 
-    def R(self, energy):
-        return [tm.get_params(energy).R for tm in self._tms]
+    def __init_tms(self, tm):
+        try:
+            self._tms = self._create_tms(self.element, tm)
+            self._tm_class_type = tm
+        except AttributeError as e:
+            print(f"Can't set {tm.__name__} for {self.__class__.__name__} fall back to default tm which is {self.default_tm.__name__}.")
+            self._tms = self._create_tms(self.element, self.default_tm)
+            self._tm_class_type = self.default_tm
 
     def dot_tms(self, obj):
         """[summary]
@@ -67,8 +73,7 @@ class OpticElement:
 
     def set_tm(self, tm: Transformation):
         if tm != self._tm_class_type:
-            self._tm_class_type = tm
-            self._tms = self._create_tms(self.element, tm)
+            self.__init_tms(tm)
 
     def get_section_tms(self, delta_l: float, start_l: float == 0.0):
         #tms = [TMTypes.ROT_ENTRANCE]
@@ -85,7 +90,7 @@ class OpticElement:
                 tm_list.append(copy(tm))
         else:
             TM_Class = self.get_tm(TMTypes.MAIN).__class__
-            tm_list.append(TM_Class.create(element=self.element, tm_type=TMTypes.MAIN, delta_l=delta_l))
+            tm_list.append(TM_Class.from_element(element=self.element, tm_type=TMTypes.MAIN, delta_l=delta_l))
         # tms.append(TMTypes.ROT_EXIT)
         return tm_list
 
@@ -108,11 +113,11 @@ class OpticElement:
         tms = []
         #tms = [tm.create(element, TMTypes.ROT_ENTRANCE)]
         if element.has_edge:
-            tms.append(tm.create(element, TMTypes.ENTRANCE))
-            tms.append(tm.create(element, TMTypes.MAIN))
-            tms.append(tm.create(element, TMTypes.EXIT))
+            tms.append(tm.from_element(element, TMTypes.ENTRANCE))
+            tms.append(tm.from_element(element, TMTypes.MAIN))
+            tms.append(tm.from_element(element, TMTypes.EXIT))
         else:
-            tms.append(tm.create(element, TMTypes.MAIN))
+            tms.append(tm.from_element(element, TMTypes.MAIN))
         #tms = [tm.create(element, TMTypes.ROT_EXIT)]
         return tms
 

@@ -33,4 +33,4 @@ class RBend(OpticElement):
             e2 += angle / 2.
 
         super().__init__(RBendAtom(l=l, angle=angle, e1=e1, e2=e2, k1=k1, k2=k2, tilt=tilt,
-                      gap=gap, h_pole1=h_pole1, h_pole2=h_pole2, fint=fint, fintx=fintx, eid=eid), tm=tm)
+                      gap=gap, h_pole1=h_pole1, h_pole2=h_pole2, fint=fint, fintx=fintx, eid=eid), tm=tm, default_tm=TransferMap)

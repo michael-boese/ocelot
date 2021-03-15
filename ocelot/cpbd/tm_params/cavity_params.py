@@ -4,8 +4,8 @@ from ocelot.cpbd.r_matrix import rot_mtx
 import functools
 
 class CavityParams(FirstOrderParams):
-    def __init__(self, R, B, tilt) -> None:
+    def __init__(self, R, B, tilt, v, freq, phi) -> None:
         super().__init__(R, B, tilt)
-        self.R = R
-        self.B = B
-        self.tilt = tilt
+        self.v = v
+        self.freq = freq
+        self.phi = phi

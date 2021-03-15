@@ -51,6 +51,14 @@ class MethodTM:
         self.sec_order_mult = SecondOrderMult()
         self.nkick = self.params['nkick'] if 'nkick' in self.params else 1
 
+    def to_dict(self):
+        res = self.params
+        if self.params.get('global') != self.global_method:
+            res['global'] = self.global_method
+        if not self.params.get('nKick') != self.nkick:
+            res['nkick'] = self.nkick
+        return res
+        
 
 def lattice_transfer_map(lattice, energy):
     """
@@ -300,6 +308,10 @@ class Navigator:
         self.unit_step = 1  # unit step for physics processes
         self.proc_kick_elems = []
         self.kill_process = False  # for case when calculations are needed to terminated e.g. from gui
+
+    def get_current_element(self):
+        if self.n_elem < len(self.lat):
+            return self.lat[self.n_elem]
 
     def reset_position(self):
         """

@@ -11,4 +11,4 @@ class Sextupole(OpticElement):
     """
 
     def __init__(self, l=0., k2=0., tilt=0., eid=None, tm=TransferMap):
-        super().__init__(SextupoleAtom(l=l, k2=k2, tilt=tilt, eid=eid), tm=tm)
+        super().__init__(SextupoleAtom(l=l, k2=k2, tilt=tilt, eid=eid), tm=tm, default_tm=TransferMap)

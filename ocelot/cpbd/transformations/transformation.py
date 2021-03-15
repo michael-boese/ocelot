@@ -7,6 +7,7 @@ from typing import Callable, Union
 from abc import ABC, abstractmethod
 
 from ocelot.cpbd.beam import Twiss, Particle, ParticleArray
+from ocelot.cpbd.elements.element import Element
 
 _logger = logging.getLogger(__name__)
 
@@ -37,6 +38,9 @@ class Transformation(ABC):
         self._delta_e_func = delta_e_func if tm_type == TMTypes.MAIN else None  # entrance/exit functions (e.g Edges or Couplerkicks) do not change beam energy.
         self.tm_type = tm_type
 
+        self.__current_energy = None  # used for caching tm params
+        self._params = None
+
         self._map = None
 
     def get_delta_e(self):
@@ -44,6 +48,11 @@ class Transformation(ABC):
             return self._delta_e_func(delta_length=self.delta_length, total_length=self.length)
         else:
             return 0.0
+
+    @classmethod
+    @abstractmethod
+    def from_element(cls, element: Element, tm_type: TMTypes = TMTypes.MAIN, delta_l=0.0):
+        raise NotImplementedError
 
     @classmethod
     def create(cls, main_tm_params_func, delta_e_func, length, delta_length=0.0, entrance_tm_params_func=None, exit_tm_params_func=None, tm_type: TMTypes = TMTypes.MAIN):
@@ -63,10 +72,11 @@ class Transformation(ABC):
             delta_length = length
         return cls(create_tm_param_func=tm_params_func, delta_e_func=delta_e_func, tm_type=tm_type, length=length, delta_length=delta_length)
 
-    # twiss and tms using the same parameter
-#    @functools.lru_cache(maxsize=3)
     def get_params(self, energy: float):
-        return self.create_tm_param_func(energy, self.delta_length)
+        if not self._params or self.__current_energy != energy:
+            self._params = self.create_tm_param_func(energy, self.delta_length)
+            self.__current_energy = energy
+        return self._params
 
     @abstractmethod
     def map_function(self, delta_length: float = None, length: float = None):

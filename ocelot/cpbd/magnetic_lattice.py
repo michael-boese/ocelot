@@ -124,12 +124,12 @@ class MagneticLattice:
     def __init__(self, sequence, start=None, stop=None, method=None):
         if method is None:
             method = {'global': TransferMap}
-        self.sequence = list(flatten(sequence))
         if isinstance(method, dict):
             self.method = method
         else:
-            self.method = method.params
+            self.method = method.to_dict()
 
+        self.sequence = list(flatten(sequence))
         self.sequence = self.get_sequence_part(start, stop)
 
         # create transfer map and calculate lattice length
