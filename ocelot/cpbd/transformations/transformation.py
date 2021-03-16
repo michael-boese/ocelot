@@ -25,7 +25,7 @@ class Transformation(ABC):
     TransferMap is a basic class of all TransferMaps and defines the Interface for them.
     """
 
-    def __init__(self, create_tm_param_func, delta_e_func, tm_type: TMTypes, length: float, delta_length: float = 0.0) -> None:
+    def __init__(self, create_tm_param_func, delta_e_func, tm_type: TMTypes, length: float, delta_length: float = None) -> None:
         """[summary]
 
         Args:
@@ -101,13 +101,3 @@ class Transformation(ABC):
         :rtype: TransferMap, 'TransferMap', Twiss
         """
         pass
-
-    # @abstractmethod
-    # def __call__(self, delta_length: float) -> 'TransferMap':
-    #     """[summary]
-    #     :param delta_length: delta length of the element
-    #     :type delta_length: float
-    #     :return: a new TransferMap for delta_length
-    #     :rtype: 'TransferMap'
-    #     """
-    #     pass

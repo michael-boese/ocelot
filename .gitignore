@@ -27,3 +27,4 @@ unit_tests/ebeam_test/linac_orb_correct/ref_results/test.p
 unit_tests/ebeam_test/section_track/data/
 filed_map.txt
 unit_tests/test_data
+*.ipynb

@@ -21,10 +21,10 @@ class TransferMap(Transformation):
     @classmethod
     def from_element(cls, element: Element, tm_type: TMTypes = TMTypes.MAIN, delta_l=None):
         return cls.create(entrance_tm_params_func=element.create_first_order_entrance_params if element.has_edge else None,
-                              delta_e_func=element.create_delta_e,
-                              main_tm_params_func=element.create_first_order_main_params,
-                              exit_tm_params_func=element.create_first_order_exit_params if element.has_edge else None,
-                              tm_type=tm_type, length=element.l, delta_length=delta_l)
+                          delta_e_func=element.create_delta_e,
+                          main_tm_params_func=element.create_first_order_main_params,
+                          exit_tm_params_func=element.create_first_order_exit_params if element.has_edge else None,
+                          tm_type=tm_type, length=element.l, delta_length=delta_l)
 
     # @property
     # def map(self):
@@ -56,9 +56,9 @@ class TransferMap(Transformation):
         rparticles[:] = a[:]
         return rparticles
 
-    def multiply_with_tm(self, tm: 'TransferMap', length) -> 'TransferMap':
-        return TransferMap(create_tm_param_func=lambda energy, delta_length: self.get_params(energy, delta_length) * tm.get_params(energy, delta_length),
-                           length=length)
+    def multiply_with_tm(self, tm: 'TransferMap') -> 'TransferMap':
+        return TransferMap(create_tm_param_func=lambda energy: self.get_params(energy) * tm.get_params(energy),
+                           length=self.length + tm.length)
 
     def __mul__(self, m):
         """
@@ -70,7 +70,7 @@ class TransferMap(Transformation):
         B = (E - R)*dX
         """
         try:
-            return m.multiply_with_tm(self, self.length)
+           return m.multiply_with_tm(self)
         except AttributeError as e:
             _logger.error(
                 " TransferMap.__mul__: unknown object in transfer map multiplication: " + str(m.__class__.__name__))

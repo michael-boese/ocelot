@@ -117,9 +117,9 @@ class Twiss:
                 self.gamma_y = (1 + beam.alpha_y * beam.alpha_y) / beam.beta_y
             self.E = beam.E
 
-    def multiply_with_tm(self, tm: 'TransferMap', length):
+    def multiply_with_tm(self, tm: 'TransferMap'):
         tws = self.map_x_twiss(tm)
-        tws.s = self.s + length
+        tws.s = self.s + tm.length
         return tws
 
     def map_x_twiss(self, tm):
@@ -232,7 +232,7 @@ class Particle:
         val = val + "s = " + str(self.s)
         return val
 
-    def multiply_with_tm(self, tm: 'TransferMap', length):
+    def multiply_with_tm(self, tm: 'TransferMap'):
         tm.apply(self)
         return deepcopy(self)
 
