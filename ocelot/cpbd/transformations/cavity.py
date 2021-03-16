@@ -12,12 +12,12 @@ class CavityTM(TransferMap):
         super().__init__(create_tm_param_func, delta_e_func, tm_type, length, delta_length=delta_length)
 
     @classmethod
-    def from_element(cls, element: Element, tm_type: TMTypes = TMTypes.MAIN, delta_l=0.0):
+    def from_element(cls, element: Element, tm_type: TMTypes = TMTypes.MAIN, delta_l=None):
         return cls.create(entrance_tm_params_func=element.create_cavity_tm_entrance_params,
-                                    delta_e_func=element.create_delta_e,
-                                    main_tm_params_func=element.create_cavity_tm_main_params,
-                                    exit_tm_params_func=element.create_cavity_tm_exit_params,
-                                    tm_type=tm_type, length=element.l, delta_length=delta_l)
+                          delta_e_func=element.create_delta_e,
+                          main_tm_params_func=element.create_cavity_tm_main_params,
+                          exit_tm_params_func=element.create_cavity_tm_exit_params,
+                          tm_type=tm_type, length=element.l, delta_length=delta_l)
 
     def map4cav(self, X, E, delta_length, length):
         params = self.get_params(E)
@@ -69,7 +69,7 @@ class CavityTM(TransferMap):
 
         return X
 
-    def map_function(self, delta_length: float = None, length: float = None):
+    def map_function(self, length: float = None, delta_length: float = None):
         if self.tm_type == TMTypes.MAIN:
             return lambda X, energy: self.map4cav(X, energy, delta_length, length)
         else:

@@ -41,13 +41,13 @@ class Element:
     def _default_B(self, R):
         return np.dot((np.eye(6) - R), np.array([[self.dx], [0.], [self.dy], [0.], [0.], [0.]]))
 
-    def create_first_order_main_params(self, energy: float, delta_length: float = 0.0) -> FirstOrderParams:
+    def create_first_order_main_params(self, energy: float, delta_length: float = None) -> FirstOrderParams:
         k1 = self.k1
         if self.l == 0:
             hx = 0.
         else:
             hx = self.angle / self.l
-        if delta_length != 0.0:
+        if delta_length:
             R = uni_matrix(delta_length, k1, hx=hx, sum_tilts=0, energy=energy)
         else:
             R = uni_matrix(self.l, k1, hx=hx, sum_tilts=0, energy=energy)

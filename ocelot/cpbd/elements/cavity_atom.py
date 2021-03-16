@@ -171,7 +171,7 @@ class CavityAtom(Element):
         return b
 
     def create_cavity_tm_main_params(self, energy: float, delta_length: float) -> CavityParams:
-        R = self._R_main_matrix(energy=energy, length=delta_length if delta_length != 0 else self.l)
+        R = self._R_main_matrix(energy=energy, length=delta_length if delta_length else self.l)
         B = self._default_B(R)
         return CavityParams(R=R, B=B, tilt=self.tilt, v=self.v, freq=self.freq, phi=self.phi)
 
@@ -186,7 +186,7 @@ class CavityAtom(Element):
         return CavityParams(R=R, B=B, tilt=self.tilt, v=self.v, freq=self.freq, phi=self.phi)
 
     # def create_first_order_main_params(self, energy: float, delta_length: float) -> FirstOrderParams:
-    #     R = self._R_main_matrix(energy=energy, length=delta_length if delta_length != 0 else self.l)
+    #     R = self._R_main_matrix(energy=energy, length=delta_length if delta_length else self.l)
     #     B = self._default_B(R)
     #     return FirstOrderParams(R, B, self.tilt)
 
@@ -200,8 +200,8 @@ class CavityAtom(Element):
     #     B = self._default_B(R)
     #     return FirstOrderParams(R, B, self.tilt)
 
-    def create_delta_e(self, total_length, delta_length=0.0) -> float:
-        if delta_length != 0.0:
+    def create_delta_e(self, total_length, delta_length=None) -> float:
+        if delta_length:
             phase_term = np.cos(self.phi * np.pi / 180.)
             return phase_term * self.v * delta_length / total_length if total_length != 0 else phase_term * self.v
         else:

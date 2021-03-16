@@ -26,8 +26,8 @@ class TWCavity(Element):
         self.phi = phi  # in grad
         self.E = 0
 
-    def create_delta_e(self, total_length, delta_length=0.0) -> float:
-        if delta_length != 0.0:
+    def create_delta_e(self, total_length, delta_length=None) -> float:
+        if delta_length:
             return self.v * np.cos(self.phi * np.pi / 180.) * delta_length / total_length
         else:
             return self.v * np.cos(self.phi * np.pi / 180.)

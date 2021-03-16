@@ -51,11 +51,11 @@ class Transformation(ABC):
 
     @classmethod
     @abstractmethod
-    def from_element(cls, element: Element, tm_type: TMTypes = TMTypes.MAIN, delta_l=0.0):
+    def from_element(cls, element: Element, tm_type: TMTypes = TMTypes.MAIN, delta_l=None):
         raise NotImplementedError
 
     @classmethod
-    def create(cls, main_tm_params_func, delta_e_func, length, delta_length=0.0, entrance_tm_params_func=None, exit_tm_params_func=None, tm_type: TMTypes = TMTypes.MAIN):
+    def create(cls, main_tm_params_func, delta_e_func, length, delta_length=None, entrance_tm_params_func=None, exit_tm_params_func=None, tm_type: TMTypes = TMTypes.MAIN):
         try:
             if tm_type == TMTypes.ENTRANCE:
                 tm_params_func = entrance_tm_params_func
@@ -67,7 +67,7 @@ class Transformation(ABC):
                 raise NotImplementedError(f"{'entrance' if tm_type == TMTypes.ENTRANCE else 'exit'} function is not set in {cls.__class__.__name__}'s __init__")
         except AttributeError:
             raise NotImplementedError(f"The specific element have to implement the function {tm_params_func.__name__}.")
-        if delta_length > length:
+        if delta_length and (delta_length > length):
             _logger.warning("delta_l > length of element. Set delta_l == length of element.")
             delta_length = length
         return cls(create_tm_param_func=tm_params_func, delta_e_func=delta_e_func, tm_type=tm_type, length=length, delta_length=delta_length)

@@ -58,7 +58,7 @@ class MethodTM:
         if not self.params.get('nKick') != self.nkick:
             res['nkick'] = self.nkick
         return res
-        
+
 
 def lattice_transfer_map(lattice, energy):
     """
@@ -310,8 +310,8 @@ class Navigator:
         self.kill_process = False  # for case when calculations are needed to terminated e.g. from gui
 
     def get_current_element(self):
-        if self.n_elem < len(self.lat):
-            return self.lat[self.n_elem]
+        if self.n_elem < len(self.lat.sequence):
+            return self.lat.sequence[self.n_elem]
 
     def reset_position(self):
         """
@@ -524,7 +524,7 @@ def get_map(lattice, dz, navi):
 
         dl = L - navi.z0
         # TM.append(elem.transfer_map(dl))
-        TM += elem.get_section_tms(start_l=navi.z0 - navi.sum_lengths, delta_l=dl)
+        TM += elem.get_section_tms(start_l=navi.z0 + elem.l - L, delta_l=dl)
 
         navi.z0 = L
         dz -= dl
@@ -537,7 +537,7 @@ def get_map(lattice, dz, navi):
         # if i in navi.proc_kick_elems:
         #    break
     if abs(dz) > 1e-10:
-        TM += elem.get_section_tms(start_l=navi.z0 - navi.sum_lengths, delta_l=dz)
+        TM += elem.get_section_tms(start_l=navi.z0 + elem.l - L, delta_l=dz)
         # TM.append(elem.transfer_map(dz))
     navi.z0 += dz
     navi.sum_lengths = L - elem.l
