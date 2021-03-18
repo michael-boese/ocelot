@@ -126,6 +126,7 @@ def test_plot():
     plt.show()
     assert False
 
+
 def test_get_maps_two_cavity_two_sbend_lat():
     method = MethodTM()
 
@@ -156,7 +157,7 @@ def test_get_maps_two_cavity_two_sbend_lat():
 
 
 def test_maps_of_fel():
-    method = MethodTM()
+    method = MethodTM({'global': TransferMap, 'Vcor': SecondTM, 'Hcor': SecondTM})
 
     # for second order tracking we have to choose SecondTM
     method.global_method = TransferMap
@@ -191,14 +192,4 @@ def test_maps_of_fel():
             p_array_ground_truth = load_particle_array(data_name)
             compare_p_array(p_array, p_array_ground_truth)
             i += 1
-            print(f"Next Element: {navi.lat.sequence[i].__class__.__name__}")
 
-    # tms = (tms for tms, _, _, _ in navi.get_next_step())
-    # for i, t_map in enumerate((tm for sub_tms in tms for tm in sub_tms)):
-    #     t_map.apply(p_array)
-    #     name = navi.lat.sequence[navi.n_elem].__class__.__name__
-    #     data_name = f"unit_tests/test_data/ground_truth_output_{name}_{i}.npz"
-    #     p_array_ground_truth = load_particle_array(data_name)
-    #     print(data_name)
-
-    #     compare_p_array(p_array, p_array_ground_truth)

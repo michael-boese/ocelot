@@ -24,7 +24,7 @@ def first_order_test(element: Element, name: str, ground_truth_data: Data, tm_ty
     for energy, R_ground_truth, B_ground_truth in ground_truth_data.zip(name):
         params = tm.get_params(energy=energy)
         #assert np.allclose(params.get_rotated_R(), R_ground_truth, rtol=1e-05, atol=1e-08, equal_nan=False)
-        r_rot = params.get_rotated_R()
+
         assert np.allclose(params.get_rotated_R(), R_ground_truth, rtol=1e-05, atol=1e-08, equal_nan=False)
         assert np.allclose(params.B, B_ground_truth, rtol=1e-05, atol=1e-08, equal_nan=False)
 
@@ -76,11 +76,13 @@ def test_first_order_solenoid(load_ground_truth_data):
 
 
 def test_first_order_hcor(load_ground_truth_data):
-    first_order_test(HcorAtom(l=0.1, angle=0.0, eid='CIX.102.I1'), 'Hcor', load_ground_truth_data)
+    params = load_ground_truth_data.get_params('Hcor')
+    first_order_test(HcorAtom(**params), 'Hcor', load_ground_truth_data)
 
 
 def test_first_order_vcor(load_ground_truth_data):
-    first_order_test(VcorAtom(l=0.1, angle=0.0, eid='CIX.102.I1'), 'Vcor', load_ground_truth_data)
+    params = load_ground_truth_data.get_params('Vcor')
+    first_order_test(VcorAtom(**params), 'Vcor', load_ground_truth_data)
 
 
 def test_cavity_entrance(load_ground_truth_data):

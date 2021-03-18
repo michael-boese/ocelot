@@ -17,6 +17,9 @@ class Data():
     def get_B(self, element_name: str):
         return [np.array(B, dtype='float64') for B in self.ground_truth_data[element_name]['B']]
 
+    def get_params(self, element_name: str):
+        return self.ground_truth_data[element_name]['params']
+
     def get_energy(self, element_name: str):
         return self.ground_truth_data[element_name]['energy_list']
 
