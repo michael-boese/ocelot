@@ -2,6 +2,7 @@ import numpy as np
 
 from ocelot.cpbd.tm_params.second_order_params import SecondOrderParams
 from ocelot.cpbd.tm_params.first_order_params import FirstOrderParams
+from ocelot.cpbd.tm_params.kick_params import KickParams
 from ocelot.cpbd.high_order import t_nnn
 from ocelot.cpbd.r_matrix import rot_mtx, uni_matrix
 
@@ -20,9 +21,9 @@ class Element:
             self.id = "ID_{0}_".format(np.random.randint(100000000))
         self.l = 0.
         self.tilt = 0.  # rad, pi/4 to turn positive quad into negative skew
-        self.angle = 0.
-        self.k1 = 0.
-        self.k2 = 0.
+        self.angle = 0. # Magnets Drift, Bend, Correctors (just angle)
+        self.k1 = 0. # Magnets quatropole
+        self.k2 = 0. # Magnets Sixtropole
         self.dx = 0.
         self.dy = 0.
         self.params = {}
@@ -59,7 +60,16 @@ class Element:
         T = t_nnn(delta_length if delta_length else self.l, 0. if self.l == 0 else self.angle / self.l, self.k1, self.k2,
                   energy)
         first_order_params = self.create_first_order_main_params(energy, delta_length)
-        return SecondOrderParams(first_order_params.R, first_order_params.B, T)
+        return SecondOrderParams(first_order_params.R, first_order_params.B, T, self.tilt, self.dx, self.dy)
+
+    def create_kick_entrance_params(self) -> KickParams:
+        return KickParams(dx=self.dx, dy=self.dy, angle=self.angle, tilt=self.tilt, k1=self.k1, k2=self.k2)
+
+    def create_kick_main_params(self) -> KickParams:
+        return KickParams(dx=self.dx, dy=self.dy, angle=self.angle, tilt=self.tilt, k1=self.k1, k2=self.k2)
+
+    def create_kick_exit_params(self) -> KickParams:
+        return KickParams(dx=self.dx, dy=self.dy, angle=self.angle, tilt=self.tilt, k1=self.k1, k2=self.k2)
 
     def create_delta_e(self, total_length, delta_length=0.0):
         return 0.0

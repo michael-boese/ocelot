@@ -84,10 +84,10 @@ class BendAtom(Element):
         first_order_params = self.create_first_order_entrance_params(energy)
         _, T = fringe_ent(h=self.h, k1=self.k1, e=self.e1, h_pole=self.h_pole1,
                           gap=self.gap, fint=self.fint)
-        return SecondOrderParams(first_order_params.R, first_order_params.B, T)
+        return SecondOrderParams(first_order_params.R, first_order_params.B, T, self.tilt, self.dx, self.dy)
 
     def create_second_order_exit_params(self, energy: float, delta_length: float = 0.0) -> SecondOrderParams:
         first_order_params = self.create_first_order_exit_params(energy)
         _, T = fringe_ext(h=self.h, k1=self.k1, e=self.e2, h_pole=self.h_pole2,
                           gap=self.gap, fint=self.fintx)
-        return SecondOrderParams(first_order_params.R, first_order_params.B, T)
+        return SecondOrderParams(first_order_params.R, first_order_params.B, T, self.tilt, self.dx, self.dy)

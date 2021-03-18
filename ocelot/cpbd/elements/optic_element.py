@@ -5,7 +5,9 @@ from typing import List, Dict, Type
 import numpy as np
 
 from ocelot.cpbd.elements.element import Element
+from ocelot.cpbd.transformations import second_order
 from ocelot.cpbd.transformations.transformation import Transformation, TMTypes
+from ocelot.cpbd.transformations.second_order import SecondTM
 
 
 class OpticElement:
@@ -18,8 +20,12 @@ class OpticElement:
     def __init__(self, element: Element, tm: Type[Transformation], default_tm: Transformation) -> None:
         self.element = element
         self.default_tm = default_tm
-        self.__init_tms(tm)
-
+        self._first_order_tms = self._create_tms(self.element, default_tm)  # every optics element has a first_order tm to calculate e.g Twiss Paramters
+        if default_tm == tm:
+            self._tms = self._first_order_tms
+            self._tm_class_type = tm
+        else:
+            self.__init_tms(tm)
         self.__is_init = True  # needed to disable __getattr__ and __setattr__ is is executed
 
         # self.__dict__['element'] = element
@@ -41,6 +47,24 @@ class OpticElement:
     @property
     def tms(self):
         return self._tms
+
+    def B(self, energy):
+        if self._tm_class_type == SecondTM:
+            return [tm.get_params(energy).B for tm in self._tms]
+        else:
+            return [tm.get_params(energy).B for tm in self._first_order_tms]
+
+    def R(self, energy):
+        if self._tm_class_type == SecondTM:
+            return [tm.get_params(energy).R for tm in self._tms]
+        else:
+            return [tm.get_params(energy).R for tm in self._first_order_tms]
+
+    def T(self, energy):
+        if self._tm_class_type == SecondTM:
+            return [tm.get_params(energy).get_roteted_T() for tm in self._tms]
+        else:
+            return [np.zeros((6, 6, 6)) for _ in self._first_order_tms]
 
     def __init_tms(self, tm):
         try:
@@ -73,7 +97,10 @@ class OpticElement:
 
     def set_tm(self, tm: Transformation):
         if tm != self._tm_class_type:
-            self.__init_tms(tm)
+            if tm == self.default_tm:
+                self._tms = self._first_order_tms
+            else: 
+                self.__init_tms(tm)
 
     def get_section_tms(self, delta_l: float, start_l: float == 0.0):
         #tms = [TMTypes.ROT_ENTRANCE]

@@ -27,6 +27,6 @@ class Data():
 @pytest.fixture(scope='module')
 def load_ground_truth_data():
     cwd = os.getcwd()
-    with open('unit_tests/test_data/first_order_param_ground_truth.json') as fp:
+    with open('unit_tests/test_data/first_order_param/first_order_param_ground_truth.json') as fp:
         ground_truth_data = json.load(fp)
     return Data(ground_truth_data)

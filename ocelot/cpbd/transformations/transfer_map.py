@@ -3,7 +3,6 @@ import logging
 
 import numpy as np
 
-from ocelot.cpbd.beam import Particle, ParticleArray
 from ocelot.cpbd.transformations.transformation import Transformation, TMTypes
 from ocelot.cpbd.elements.element import Element
 
@@ -70,55 +69,12 @@ class TransferMap(Transformation):
         B = (E - R)*dX
         """
         try:
-           return m.multiply_with_tm(self)
+            return m.multiply_with_tm(self)
         except AttributeError as e:
             _logger.error(
                 " TransferMap.__mul__: unknown object in transfer map multiplication: " + str(m.__class__.__name__))
             raise Exception(
                 " TransferMap.__mul__: unknown object in transfer map multiplication: " + str(m.__class__.__name__))
-
-    def apply(self, prcl_series):
-        """
-        :param prcl_series: can be list of Particles [Particle_1, Particle_2, ... ] or ParticleArray
-        :return: None
-        """
-        if prcl_series.__class__ == ParticleArray:
-            self.map_function(self.length, self.delta_length)(prcl_series.rparticles, energy=prcl_series.E)
-            #self.map(prcl_series.rparticles, energy=prcl_series.E)
-            prcl_series.E += self.get_delta_e()
-            #prcl_series.E += self.delta_e
-            prcl_series.s += self.length
-
-        elif prcl_series.__class__ == Particle:
-            p = prcl_series
-            p.x, p.px, p.y, p.py, p.tau, p.p = self.map(np.array([[p.x], [p.px], [p.y], [p.py], [p.tau], [p.p]]), p.E)[
-                :, 0]
-            p.s += self.length
-            p.E += self.delta_e
-
-        elif prcl_series.__class__ == list and prcl_series[0].__class__ == Particle:
-            # If the energy is not the same (p.E) for all Particles in the list of Particles
-            # in that case cycle is applied. For particles with the same energy p.E
-            list_e = np.array([p.E for p in prcl_series])
-            if False in (list_e[:] == list_e[0]):
-                for p in prcl_series:
-                    self.map(np.array([[p.x], [p.px], [p.y], [p.py], [p.tau], [p.p]]), energy=p.E)
-
-                    p.E += self.delta_e
-                    p.s += self.length
-            else:
-                pa = ParticleArray()
-                pa.list2array(prcl_series)
-                pa.E = prcl_series[0].E
-                self.map(pa.rparticles, energy=pa.E)
-                pa.E += self.delta_e
-                pa.s += self.length
-                pa.array2ex_list(prcl_series)
-
-        else:
-            _logger.error(" TransferMap.apply(): Unknown type of Particle_series: " + str(prcl_series.__class__.__name))
-            raise Exception(
-                " TransferMap.apply(): Unknown type of Particle_series: " + str(prcl_series.__class__.__name))
 
     # TODO: Refactor old style
     # def __call__(self, delta_length):

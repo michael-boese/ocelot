@@ -10,7 +10,7 @@ from ocelot.cpbd.physics_proc import RectAperture, EllipticalAperture
 from ocelot.cpbd.high_order import *
 
 from ocelot.cpbd.r_matrix import *
-from ocelot.cpbd.transformations.tm_utils import SecondOrderMult, transfer_maps_mult, unsym_matrix
+from ocelot.cpbd.tm_utils import SecondOrderMult, transfer_maps_mult, unsym_matrix
 from ocelot.cpbd.transformations.second_order import SecondTM
 
 _logger = logging.getLogger(__name__)

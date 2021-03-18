@@ -11,20 +11,30 @@ from ocelot.cpbd.elements import *
 from ocelot.cpbd.beam import get_envelope
 from ocelot.cpbd.track import track
 from ocelot.cpbd.optics import lattice_transfer_map, twiss, periodic_twiss, Twiss
-from ocelot.cpbd.transformations.tm_utils import SecondOrderMult
+from ocelot.cpbd.tm_utils import SecondOrderMult
 
 
 def weights_default(val):
-    if val == 'periodic': return 10000001.0
-    if val == 'total_len': return 10000001.0
-    if val == 'Dx': return 10000002.0
-    if val == 'Dxp': return 10000003.0
-    if val == 'tau': return 10000004.0
-    if val == 'i5': return 1.e14
-    if val == 'negative_length': return 1.5e6
-    if val in ['alpha_x', 'alpha_y']: return 100007.0
-    if val in ['mux', 'muy']: return 10000006.0
-    if val in ['beta_x', 'beta_y']: return 100007.0
+    if val == 'periodic':
+        return 10000001.0
+    if val == 'total_len':
+        return 10000001.0
+    if val == 'Dx':
+        return 10000002.0
+    if val == 'Dxp':
+        return 10000003.0
+    if val == 'tau':
+        return 10000004.0
+    if val == 'i5':
+        return 1.e14
+    if val == 'negative_length':
+        return 1.5e6
+    if val in ['alpha_x', 'alpha_y']:
+        return 100007.0
+    if val in ['mux', 'muy']:
+        return 10000006.0
+    if val in ['beta_x', 'beta_y']:
+        return 100007.0
     return 0.0001
 
 
@@ -116,7 +126,7 @@ def match(lat, constr, vars, tw, verbose=True, max_iter=1000, method='simplex', 
             if isinstance(vars[i], tuple):  # all quads strength in tuple varied simultaneously
                 for v in vars[i]:
                     v.k1 = x[i]
-                    v.create_tm()        
+                    v.create_tm()
 
         err = 0.0
         if "periodic" in constr.keys():
@@ -131,8 +141,10 @@ def match(lat, constr, vars, tw, verbose=True, max_iter=1000, method='simplex', 
 
         ref_hsh = {}  # penalties on two-point inequalities
         for e in constr.keys():
-            if e == 'periodic': continue
-            if e == 'total_len': continue
+            if e == 'periodic':
+                continue
+            if e == 'total_len':
+                continue
             for k in constr[e].keys():
                 if isinstance(constr[e][k], list):
                     if constr[e][k][0] == '->':
@@ -224,7 +236,8 @@ def match(lat, constr, vars, tw, verbose=True, max_iter=1000, method='simplex', 
             Jx = 1 - I4 / I2
             Jy = 1
 
-            if Je < 0 or Jx < 0 or Jy < 0: err = 100000.0
+            if Je < 0 or Jx < 0 or Jy < 0:
+                err = 100000.0
 
         # c1, c2 = natural_chromaticity(lat, tw0)
         # err += ( c1**2 + c2**2) * 1.e-6
@@ -260,9 +273,12 @@ def match(lat, constr, vars, tw, verbose=True, max_iter=1000, method='simplex', 
                 x[i] = vars[i].k1
 
     print("initial value: x = ", x)
-    if method == 'simplex': res = fmin(errf, x, xtol=1e-5, maxiter=max_iter, maxfun=max_iter)
-    if method == 'cg': res = fmin_cg(errf, x, gtol=1.e-5, epsilon=1.e-5, maxiter=max_iter)
-    if method == 'bfgs': res = fmin_bfgs(errf, x, gtol=1.e-5, epsilon=1.e-5, maxiter=max_iter)
+    if method == 'simplex':
+        res = fmin(errf, x, xtol=1e-5, maxiter=max_iter, maxfun=max_iter)
+    if method == 'cg':
+        res = fmin_cg(errf, x, gtol=1.e-5, epsilon=1.e-5, maxiter=max_iter)
+    if method == 'bfgs':
+        res = fmin_bfgs(errf, x, gtol=1.e-5, epsilon=1.e-5, maxiter=max_iter)
 
     '''
     if initial twiss was varied set the twiss argument object to resulting value
@@ -276,16 +292,26 @@ def match(lat, constr, vars, tw, verbose=True, max_iter=1000, method='simplex', 
 
 
 def weights_default(val):
-    if val == 'periodic': return 1
-    if val == 'total_len': return 1
-    if val == 'Dx': return 1
-    if val == 'Dxp': return 1
-    if val == 'tau': return 1
-    if val == 'i5': return 1
-    if val == 'negative_length': return 1
-    if val in ['alpha_x', 'alpha_y']: return 1000
-    if val in ['mux', 'muy']: return 1
-    if val in ['beta_x', 'beta_y']: return 1000
+    if val == 'periodic':
+        return 1
+    if val == 'total_len':
+        return 1
+    if val == 'Dx':
+        return 1
+    if val == 'Dxp':
+        return 1
+    if val == 'tau':
+        return 1
+    if val == 'i5':
+        return 1
+    if val == 'negative_length':
+        return 1
+    if val in ['alpha_x', 'alpha_y']:
+        return 1000
+    if val in ['mux', 'muy']:
+        return 1
+    if val in ['beta_x', 'beta_y']:
+        return 1000
     return 1
 
 
@@ -371,8 +397,10 @@ def match_beam(lat, constr, vars, p_array, navi, verbose=True, max_iter=1000, me
         ref_hsh = {}  # penalties on two-point inequalities
 
         for e in constr.keys():
-            if e == 'periodic': continue
-            if e == 'total_len': continue
+            if e == 'periodic':
+                continue
+            if e == 'total_len':
+                continue
             for k in constr[e].keys():
                 if constr[e][k].__class__ == list:
                     if constr[e][k][0] == '->':
@@ -473,7 +501,8 @@ def match_beam(lat, constr, vars, p_array, navi, verbose=True, max_iter=1000, me
             Jx = 1 - I4 / I2
             Jy = 1
 
-            if Je < 0 or Jx < 0 or Jy < 0: err = 100000.0
+            if Je < 0 or Jx < 0 or Jy < 0:
+                err = 100000.0
 
         # c1, c2 = natural_chromaticity(lat, tw0)
         # err += ( c1**2 + c2**2) * 1.e-6
@@ -508,10 +537,14 @@ def match_beam(lat, constr, vars, p_array, navi, verbose=True, max_iter=1000, me
                 x[i] = vars[i].k1
 
     print("initial value: x = ", x)
-    if method == 'simplex': res = fmin(errf, x, xtol=1e-3, maxiter=max_iter, maxfun=max_iter)
-    if method == 'cg': res = fmin_cg(errf, x, gtol=1.e-5, epsilon=1.e-5, maxiter=max_iter)
-    if method == 'bfgs': res = fmin_bfgs(errf, x, gtol=1.e-5, epsilon=1.e-5, maxiter=max_iter)
-    if method == 'powell': res = minimize(errf, x, method='Powell', tol=1.e-5, options={"maxiter": max_iter})
+    if method == 'simplex':
+        res = fmin(errf, x, xtol=1e-3, maxiter=max_iter, maxfun=max_iter)
+    if method == 'cg':
+        res = fmin_cg(errf, x, gtol=1.e-5, epsilon=1.e-5, maxiter=max_iter)
+    if method == 'bfgs':
+        res = fmin_bfgs(errf, x, gtol=1.e-5, epsilon=1.e-5, maxiter=max_iter)
+    if method == 'powell':
+        res = minimize(errf, x, method='Powell', tol=1.e-5, options={"maxiter": max_iter})
     if method == "diff_evolution":
         workers = multiprocessing.cpu_count()
         bounds = []
