@@ -26,7 +26,7 @@ class OpticElement:
             self._tm_class_type = tm
         else:
             self.__init_tms(tm)
-        self.__is_init = True  # needed to disable __getattr__ and __setattr__ is is executed
+        self.__is_init = True  # needed to disable __getattr__ and __setattr__ in __init__ phase
 
         # self.__dict__['element'] = element
         # self.__dict__['_tm_class_type'] = tm
@@ -41,6 +41,7 @@ class OpticElement:
     # To access all setter attributes of element
     def __setattr__(self, name, value):
         if self.__is_init and name in self.element.__dict__:
+            #TODO: If a element attribute is set, tm have to be recalculated. That means reset the cashed valuesin tms
             return setattr(self.element, name, value)
         return object.__setattr__(self, name, value)
 

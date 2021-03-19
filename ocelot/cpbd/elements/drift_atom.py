@@ -1,7 +1,7 @@
-from ocelot.cpbd.elements.element import Element
+from ocelot.cpbd.elements.magnet import Magnet
 
 
-class DriftAtom(Element):
+class DriftAtom(Magnet):
     """
     drift - free space
     l - length of drift in [m]

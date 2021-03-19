@@ -1,6 +1,7 @@
 __author__ = 'Sergey'
 
 from copy import deepcopy
+from ocelot.cpbd.tm_params.second_order_params import SecondOrderParams
 
 from numpy.linalg import inv
 
@@ -57,6 +58,15 @@ class MethodTM:
             res['global'] = self.global_method
         if not self.params.get('nKick') != self.nkick:
             res['nkick'] = self.nkick
+        
+        # OLD BEHAVIOR: old CorrectorTM has been splitted in First Order and Second Order to keep
+        # the old behavior VCor's and Hcor's tm is set to SecondTM which is equal to
+        # the old CorrectorTM. 
+        if not res.get['Vcor']:
+            res['Vcor'] = SecondTM
+
+        if not res.get['Hcor']:
+            res['Hcor'] = SecondTM
         return res
 
 

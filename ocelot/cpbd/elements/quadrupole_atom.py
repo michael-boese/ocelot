@@ -1,9 +1,9 @@
 import numpy as np
 
-from ocelot.cpbd.elements.element import Element
+from ocelot.cpbd.elements.magnet import Magnet
 
 
-class QuadrupoleAtom(Element):
+class QuadrupoleAtom(Magnet):
     """
     quadrupole
     l - length of lens in [m],

@@ -1,14 +1,14 @@
 import numpy as np
 
 
-from ocelot.cpbd.elements.element import Element
+from ocelot.cpbd.elements.magnet import Magnet
 from ocelot.cpbd.tm_params.first_order_params import FirstOrderParams
 from ocelot.cpbd.tm_params.second_order_params import SecondOrderParams
 from ocelot.cpbd.high_order import fringe_ent, fringe_ext
 from ocelot.cpbd.r_matrix import rot_mtx
 
 
-class BendAtom(Element):
+class BendAtom(Magnet):
     """
     bending magnet
     l - length of magnet in [m],
