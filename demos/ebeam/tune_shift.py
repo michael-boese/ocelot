@@ -2,7 +2,7 @@ __author__ = 'Sergey Tomin'
 
 from ocelot.gui import *
 from ocelot.cpbd.track import *
-from ocelot.rad.radiation_py import und_field
+from ocelot.cpbd.elements.undulator_atom import und_field
 from ocelot.cpbd.optics import *
 from ocelot.cpbd.transformations import *
 

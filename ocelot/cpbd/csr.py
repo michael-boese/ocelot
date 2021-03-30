@@ -19,13 +19,13 @@ from ocelot.cpbd.beam import Particle, s_to_cur
 from ocelot.cpbd.high_order import arcline, rk_track_in_field
 
 from ocelot.cpbd.elements.undulator import Undulator
+from ocelot.cpbd.elements.undulator_atom import und_field
 from ocelot.cpbd.elements.bend import Bend
 from ocelot.cpbd.elements.rbend import RBend
 from ocelot.cpbd.elements.sbend import SBend
 from ocelot.cpbd.elements.xyquadruple import XYQuadrupole
 
 from ocelot.cpbd.physics_proc import PhysProc
-from ocelot.rad.radiation_py import und_field
 
 # Try to import numba, pyfftw and numexpr for improved performance
 logger = logging.getLogger(__name__)

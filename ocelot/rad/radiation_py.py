@@ -222,43 +222,6 @@ def traj2motion(traj):
     return motion
 
 
-def und_field_py(x, y, z, lperiod, Kx, nperiods=None):
-    kx = 0.
-    kz = 2 * pi / lperiod
-    ky = np.sqrt(kz * kz + kx * kx)
-    c = speed_of_light
-    m0 = m_e_eV
-    B0 = Kx * m0 * kz / c
-    k1 = -B0 * kx / ky
-    k2 = -B0 * kz / ky
-
-    kx_x = kx * x
-    ky_y = ky * y
-    kz_z = kz * z
-
-    cosz = np.cos(kz_z)
-
-    if nperiods is not None:
-        ph_shift = np.pi / 2.
-        heaviside = lambda x: 0.5 * (np.sign(x) + 1)
-        z_coef = (0.25 * heaviside(z) + 0.5 * heaviside(z - lperiod / 2.) + 0.25 * heaviside(z - lperiod)
-                  - 0.25 * heaviside(z - (nperiods - 1) * lperiod) - 0.5 * heaviside(
-                    z - (nperiods - 0.5) * lperiod)
-                  - 0.25 * heaviside(z - nperiods * lperiod))
-        cosz = np.cos(kz_z + ph_shift) * z_coef
-
-    cosx = np.cos(kx_x)
-    sinhy = np.sinh(ky_y)
-    # cosz = np.cos(kz_z + ph_shift)*z_coef
-    Bx = k1 * np.sin(kx_x) * sinhy * cosz  # // here kx is only real
-    By = B0 * cosx * np.cosh(ky_y) * cosz
-    Bz = k2 * cosx * sinhy * np.sin(kz_z)
-    return (Bx, By, Bz)
-
-
-und_field = und_field_py if not nb_flag else nb.jit(forceobj=False)(und_field_py)
-
-
 def energy_loss_und(energy, Kx, lperiod, L, energy_loss=False):
     if energy_loss:
         k = 4. * pi * pi / 3. * ro_e / m_e_GeV

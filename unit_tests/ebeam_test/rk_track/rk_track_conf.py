@@ -4,7 +4,7 @@ import pytest
 import numpy as np
 
 from ocelot import *
-from ocelot.rad.radiation_py import und_field
+from ocelot.cpbd.elements.undulator_atom import und_field
 from ocelot.cpbd.beam import generate_parray
 from ocelot import RungeKuttaTM
 

@@ -1,3 +1,4 @@
+from contextlib import nullcontext
 from copy import copy
 
 import numpy as np
@@ -15,12 +16,10 @@ class KickTM(Transformation):
     Implementation of the Kick Transforamtion. The class expact hat
     """
 
-    def __init__(self, create_tm_param_func, delta_e_func, tm_type: TMTypes, length: float, delta_length: float = 0.0, **params) -> None:
-        self.nkick = params.get('nkick')
+    def __init__(self, create_tm_param_func, delta_e_func, tm_type: TMTypes, length: float, delta_length: float = 0.0, **params) -> None:    
         super().__init__(create_tm_param_func, delta_e_func, tm_type, length, delta_length)
-
-    def get_params(self):
-        return self.create_tm_param_func()
+        nkick = params.get('nkick')
+        self.nkick = nkick if nkick else 1
 
 
     @classmethod
@@ -41,6 +40,9 @@ class KickTM(Transformation):
                           main_tm_params_func=element.create_kick_main_params,
                           exit_tm_params_func=element.create_kick_exit_params if element.has_edge else None,
                           tm_type=tm_type, length=element.l, delta_length=delta_l, params=params)
+
+    def get_params(self):
+        return self.create_tm_param_func()
 
     def kick(self, X, l, angle, k1, k2, k3, energy, nkick=1):
         """
@@ -86,10 +88,11 @@ class KickTM(Transformation):
         k2 = params.k2
         k3 = params.k3
         tilt = params.tilt
+        
         dx = params.dx
         dy = params.dy
 
-        nkick = self.nkick if self.nkick else 1
+        nkick = self.nkick
         l = self.delta_length if self.delta_length else self.length
 
         if dx != 0 or dy != 0 or tilt != 0:

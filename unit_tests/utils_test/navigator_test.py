@@ -108,25 +108,6 @@ def test_get_maps_Marker_lat():
     get_maps_from_single_element_lat_test(p_array_init, m, method)
 
 
-def test_plot():
-    method = MethodTM()
-    # for second order tracking we have to choose SecondTM
-    method.global_method = TransferMap
-    # for first order tracking uncomment next line
-    # method.global_method = TransferMap
-    p_array_init = load_particle_array("unit_tests/test_data/init_beam.npz")
-    lat_t = MagneticLattice(cell, start=start_sim, stop=None, method=method)
-    navi = Navigator(lat_t)
-    p_array = deepcopy(p_array_init)
-    start = time.time()
-    tws_track, p_array = track(lat_t, p_array, navi)
-    print("\n time exec:", time.time() - start, "sec")
-    # you can change top_plot argument, for example top_plot=["alpha_x", "alpha_y"]
-    plot_opt_func(lat_t, tws_track, top_plot=["E"], fig_name=0, legend=False)
-    plt.show()
-    assert False
-
-
 def test_get_maps_two_cavity_two_sbend_lat():
     method = MethodTM()
 
@@ -177,7 +158,7 @@ def test_maps_of_fel():
     bt = BeamTransform(tws=tw)
     navi = Navigator(lat_t)
 
-    ground_truth_filepaths = [p for p in Path('unit_tests/test_data').glob("**/ground_truth_output_*.npz")]
+    ground_truth_filepaths = [p for p in Path('unit_tests/test_data/fel').glob("**/ground_truth_output_*.npz")]
     ground_truth_filepaths_sorted_by_num = sorted(ground_truth_filepaths, key=lambda s: int(s.stem.split('_')[-1]))
 
     p_array = deepcopy(p_array_init)
@@ -189,7 +170,7 @@ def test_maps_of_fel():
             print(f"tm class type: {t_map.__class__.__name__} tmtype: {t_map.tm_type}")
             t_map.apply(p_array)
             data_name = ground_truth_filepaths_sorted_by_num[i]
+            print(data_name)
             p_array_ground_truth = load_particle_array(data_name)
             compare_p_array(p_array, p_array_ground_truth)
             i += 1
-

@@ -62,10 +62,10 @@ class MethodTM:
         # OLD BEHAVIOR: old CorrectorTM has been splitted in First Order and Second Order to keep
         # the old behavior VCor's and Hcor's tm is set to SecondTM which is equal to
         # the old CorrectorTM. 
-        if not res.get['Vcor']:
+        if not res.get('Vcor'):
             res['Vcor'] = SecondTM
 
-        if not res.get['Hcor']:
+        if not res.get('Hcor'):
             res['Hcor'] = SecondTM
         return res
 
