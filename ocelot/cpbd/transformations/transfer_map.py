@@ -55,9 +55,9 @@ class TransferMap(Transformation):
         rparticles[:] = a[:]
         return rparticles
 
-    def multiply_with_tm(self, tm: 'TransferMap') -> 'TransferMap':
+    def multiply_with_tm(self, tm: 'TransferMap', length) -> 'TransferMap':
         return TransferMap(create_tm_param_func=lambda energy: self.get_params(energy) * tm.get_params(energy),
-                           length=self.length + tm.length)
+                           length=length + tm.length)
 
     def __mul__(self, m):
         """
@@ -69,7 +69,7 @@ class TransferMap(Transformation):
         B = (E - R)*dX
         """
         try:
-            return m.multiply_with_tm(self)
+            return m.multiply_with_tm(self, self.delta_length if self.delta_length else self.length)
         except AttributeError as e:
             _logger.error(
                 " TransferMap.__mul__: unknown object in transfer map multiplication: " + str(m.__class__.__name__))

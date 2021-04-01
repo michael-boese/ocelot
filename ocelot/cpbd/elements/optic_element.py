@@ -41,7 +41,9 @@ class OpticElement:
     # To access all setter attributes of element
     def __setattr__(self, name, value):
         if self.__is_init and name in self.element.__dict__:
-            #TODO: If a element attribute is set, tm have to be recalculated. That means reset the cashed valuesin tms
+            #TODO: If a element attribute is set, tm have to be recalculated. That means reset the cashed values in tms
+            for tm in self._tms:
+                tm._clean_cashed_values()
             return setattr(self.element, name, value)
         return object.__setattr__(self, name, value)
 
@@ -103,7 +105,7 @@ class OpticElement:
             else: 
                 self.__init_tms(tm)
 
-    def get_section_tms(self, delta_l: float, start_l: float == 0.0):
+    def get_section_tms(self, delta_l: float, start_l: float = 0.0):
         #tms = [TMTypes.ROT_ENTRANCE]
         tm_list = []
         total_length = self.element.l
@@ -131,15 +133,6 @@ class OpticElement:
             tm_list.append(TM_Class.from_element(element=self.element, tm_type=TMTypes.MAIN, delta_l=delta_l))
         # tms.append(TMTypes.ROT_EXIT)
         return tm_list
-
-    def __call__(self, delta_length):
-        m = copy(self)
-        m.R = lambda energy: m.R_z(delta_length, energy)
-        m.B = lambda energy: m.B_z(delta_length, energy)
-        m.delta_e = m.delta_e_z(delta_length)
-        m.map = m.map_function(delta_length=delta_length, length=self.length)
-        m.length = delta_length
-        return m
 
     def get_tm(self, tm_type: TMTypes):
         for tm in self._tms:

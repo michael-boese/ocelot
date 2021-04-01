@@ -119,12 +119,18 @@ def trace_z(lattice, obj0, z_array):
     obj_elem = obj0
     for z in z_array:
         while z > L:
-            obj_elem = lattice.sequence[i].transfer_map * obj_elem
+            for tm in lattice.sequence[i].tms:
+                obj_elem = tm * obj_elem
             i += 1
             elem = lattice.sequence[i]
             L += elem.l
 
-        obj_z = elem.transfer_map(z - (L - elem.l)) * obj_elem
+        delta_l = z - (L - elem.l)
+        tms = elem.get_section_tms(start_l=0.0, delta_l=delta_l)
+
+        obj_z = obj_elem
+        for tm in tms:
+            obj_z = tm * obj_z
 
         obj_list.append(obj_z)
     return obj_list

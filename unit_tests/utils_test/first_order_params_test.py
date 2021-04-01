@@ -8,6 +8,7 @@ from ocelot.cpbd.elements.marker_atom import MarkerAtom
 from ocelot.cpbd.elements.monitor_atom import MonitorAtom
 from ocelot.cpbd.elements.quadrupole_atom import QuadrupoleAtom
 from ocelot.cpbd.elements.sbend_atom import SBendAtom
+from ocelot.cpbd.elements.rbend_atom import RBendAtom
 from ocelot.cpbd.elements.undulator_atom import UndulatorAtom
 from ocelot.cpbd.elements.cavity_atom import CavityAtom
 from ocelot.cpbd.elements.sextupole_atom import SextupoleAtom
@@ -23,9 +24,8 @@ def first_order_test(element: Element, name: str, ground_truth_data: Data, tm_ty
 
     for energy, R_ground_truth, B_ground_truth in ground_truth_data.zip(name):
         params = tm.get_params(energy=energy)
-        #assert np.allclose(params.get_rotated_R(), R_ground_truth, rtol=1e-05, atol=1e-08, equal_nan=False)
-
-        assert np.allclose(params.get_rotated_R(), R_ground_truth, rtol=1e-05, atol=1e-08, equal_nan=False)
+        r_rot = params.get_rotated_R()
+        assert np.allclose(r_rot, R_ground_truth, rtol=1e-05, atol=1e-08, equal_nan=False)
         assert np.allclose(params.B, B_ground_truth, rtol=1e-05, atol=1e-08, equal_nan=False)
 
 
@@ -39,6 +39,22 @@ def test_first_order_marker(load_ground_truth_data):
 
 def test_first_order_quadrupole(load_ground_truth_data):
     first_order_test(QuadrupoleAtom(l=0.3, k1=-1.537886, tilt=0.0, eid='Q.37.I1'), 'Quadrupole', load_ground_truth_data)
+
+
+def test_first_order_rbend_entrance(load_ground_truth_data):
+    params = load_ground_truth_data.get_params('RBend')
+    first_order_test(RBendAtom(**params), 'RBend_E1', load_ground_truth_data, tm_type=TMTypes.ENTRANCE)
+
+
+def test_first_order_rbend_main(load_ground_truth_data):
+    params = load_ground_truth_data.get_params('RBend')
+    first_order_test(RBendAtom(**params), 'RBend', load_ground_truth_data)
+
+
+def test_first_order_rbend_exit(load_ground_truth_data):
+    params = load_ground_truth_data.get_params('RBend')
+    first_order_test(RBendAtom(**params), 'RBend_E2', load_ground_truth_data, tm_type=TMTypes.EXIT)
+
 
 
 def test_first_order_sbend_entrance(load_ground_truth_data):

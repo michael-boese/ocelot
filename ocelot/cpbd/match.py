@@ -107,17 +107,13 @@ def match(lat, constr, vars, tw, verbose=True, max_iter=1000, method='simplex', 
                 vars[i].create_tm()
             if isinstance(vars[i], Quadrupole):
                 vars[i].k1 = x[i]
-                vars[i].create_tm()
             if isinstance(vars[i], Solenoid):
                 vars[i].k = x[i]
-                vars[i].create_tm()
             if isinstance(vars[i], (RBend, SBend, Bend)):
                 if vary_bend_angle:
                     vars[i].angle = x[i]
                 else:
                     vars[i].k1 = x[i]
-
-                vars[i].create_tm()
             if isinstance(vars[i], list):
                 if isinstance(vars[i][0], Twiss) and isinstance(vars[i][1], str):
 
@@ -126,7 +122,6 @@ def match(lat, constr, vars, tw, verbose=True, max_iter=1000, method='simplex', 
             if isinstance(vars[i], tuple):  # all quads strength in tuple varied simultaneously
                 for v in vars[i]:
                     v.k1 = x[i]
-                    v.create_tm()
 
         err = 0.0
         if "periodic" in constr.keys():
@@ -155,64 +150,64 @@ def match(lat, constr, vars, tw, verbose=True, max_iter=1000, method='simplex', 
         tw_loc.s = 0
 
         for e in lat.sequence:
+            for tm in e.tms: 
+                tw_loc = tm * tw_loc
 
-            tw_loc = e.transfer_map * tw_loc
+                if 'global' in constr.keys():
+                    for c in constr['global'].keys():
+                        if isinstance(constr['global'][c], list):
+                            v1 = constr['global'][c][1]
+                            if constr['global'][c][0] == '<':
+                                if tw_loc.__dict__[c] > v1:
+                                    err = err + weights(k) * (tw_loc.__dict__[c] - v1) ** 2
+                            if constr['global'][c][0] == '>':
+                                if tw_loc.__dict__[c] < v1:
+                                    err = err + weights(k) * (tw_loc.__dict__[c] - v1) ** 2
+                if 'delta' in constr.keys():
+                    if e in constr['delta'].keys():
+                        tw_k = constr['delta'][e][0]
+                        constr['delta'][e][1] = tw_loc.__dict__[tw_k]
+                if e in ref_hsh.keys():
+                    ref_hsh[e] = deepcopy(tw_loc)
 
-            if 'global' in constr.keys():
-                for c in constr['global'].keys():
-                    if isinstance(constr['global'][c], list):
-                        v1 = constr['global'][c][1]
-                        if constr['global'][c][0] == '<':
-                            if tw_loc.__dict__[c] > v1:
-                                err = err + weights(k) * (tw_loc.__dict__[c] - v1) ** 2
-                        if constr['global'][c][0] == '>':
-                            if tw_loc.__dict__[c] < v1:
-                                err = err + weights(k) * (tw_loc.__dict__[c] - v1) ** 2
-            if 'delta' in constr.keys():
-                if e in constr['delta'].keys():
-                    tw_k = constr['delta'][e][0]
-                    constr['delta'][e][1] = tw_loc.__dict__[tw_k]
-            if e in ref_hsh.keys():
-                ref_hsh[e] = deepcopy(tw_loc)
+                if e in constr.keys():
 
-            if e in constr.keys():
+                    for k in constr[e].keys():
+                        if isinstance(constr[e][k], list):
+                            v1 = constr[e][k][1]
 
-                for k in constr[e].keys():
-                    if isinstance(constr[e][k], list):
-                        v1 = constr[e][k][1]
-
-                        if constr[e][k][0] == '<':
-                            if tw_loc.__dict__[k] > v1:
-                                err = err + weights(k) * (tw_loc.__dict__[k] - v1) ** 2
-                        if constr[e][k][0] == '>':
-                            if tw_loc.__dict__[k] < v1:
-                                err = err + weights(k) * (tw_loc.__dict__[k] - v1) ** 2
-                        if constr[e][k][0] == 'a<':
-                            if np.abs(tw_loc.__dict__[k]) > v1:
-                                err = err + weights(k) * (tw_loc.__dict__[k] - v1) ** 2
-                        if constr[e][k][0] == 'a>':
-                            if np.abs(tw_loc.__dict__[k]) < v1:
-                                err = err + weights(k) * (tw_loc.__dict__[k] - v1) ** 2
-
-                        if constr[e][k][0] == '->':
-                            try:
-                                if len(constr[e][k]) > 2:
-                                    dv1 = float(constr[e][k][2])
-                                else:
-                                    dv1 = 0.0
-                                err += (tw_loc.__dict__[k] - (ref_hsh[v1].__dict__[k] + dv1)) ** 2
-
+                            if constr[e][k][0] == '<':
+                                if tw_loc.__dict__[k] > v1:
+                                    err = err + weights(k) * (tw_loc.__dict__[k] - v1) ** 2
+                            if constr[e][k][0] == '>':
                                 if tw_loc.__dict__[k] < v1:
-                                    err = err + (tw_loc.__dict__[k] - v1) ** 2
-                            except:
-                                print('constraint error: rval should precede lval in lattice')
+                                    err = err + weights(k) * (tw_loc.__dict__[k] - v1) ** 2
+                            if constr[e][k][0] == 'a<':
+                                if np.abs(tw_loc.__dict__[k]) > v1:
+                                    err = err + weights(k) * (tw_loc.__dict__[k] - v1) ** 2
+                            if constr[e][k][0] == 'a>':
+                                if np.abs(tw_loc.__dict__[k]) < v1:
+                                    err = err + weights(k) * (tw_loc.__dict__[k] - v1) ** 2
 
-                        if tw_loc.__dict__[k] < 0:
-                            err += (tw_loc.__dict__[k] - v1) ** 2
-                    elif isinstance(constr[e][k], str):
-                        pass
-                    else:
-                        err = err + weights(k) * (constr[e][k] - tw_loc.__dict__[k]) ** 2
+                            if constr[e][k][0] == '->':
+                                try:
+                                    if len(constr[e][k]) > 2:
+                                        dv1 = float(constr[e][k][2])
+                                    else:
+                                        dv1 = 0.0
+                                    err += (tw_loc.__dict__[k] - (ref_hsh[v1].__dict__[k] + dv1)) ** 2
+
+                                    if tw_loc.__dict__[k] < v1:
+                                        err = err + (tw_loc.__dict__[k] - v1) ** 2
+                                except:
+                                    print('constraint error: rval should precede lval in lattice')
+
+                            if tw_loc.__dict__[k] < 0:
+                                err += (tw_loc.__dict__[k] - v1) ** 2
+                        elif isinstance(constr[e][k], str):
+                            pass
+                        else:
+                            err = err + weights(k) * (constr[e][k] - tw_loc.__dict__[k]) ** 2
         if "total_len" in constr.keys():
             total_len = constr["periodic"]
             err = err + weights('total_len') * (tw_loc.s - total_len) ** 2

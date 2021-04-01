@@ -151,13 +151,3 @@ class Transformation(ABC):
         """
         raise NotImplementedError()
 
-    # @abstractmethod
-    # def __mul__(self, m: Union[Particle, 'TransferMap', Twiss]) -> Union[Particle, 'TransferMap', Twiss]:
-    #     """[summary]
-    #     A Transfermap can be multiplied by Particle, Twiss parameter or by a other TransferMap.
-    #     :param m: a Particle, Twiss or TransferMap
-    #     :type m: Particle, Twiss, TransferMap
-    #     :return: a new Particle, Twiss or TransferMap
-    #     :rtype: TransferMap, 'TransferMap', Twiss
-    #     """
-    #     pass
