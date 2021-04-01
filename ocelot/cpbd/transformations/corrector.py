@@ -42,4 +42,4 @@ class CorrectorTM(SecondTM):
         return X
 
     def map_function(self, delta_length=None, length=None):
-        return lambda X, energy: self.kick(X, delta_length if delta_length else self.length, length if length else self.length, self.angle_x, self.angle_y, energy)
+        return lambda X, energy: self.kick(X, delta_length if delta_length != None else self.length, length if length else self.length, self.angle_x, self.angle_y, energy)

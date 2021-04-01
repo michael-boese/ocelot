@@ -41,7 +41,7 @@ class OpticElement:
     # To access all setter attributes of element
     def __setattr__(self, name, value):
         if self.__is_init and name in self.element.__dict__:
-            #TODO: If a element attribute is set, tm have to be recalculated. That means reset the cashed values in tms
+            # TODO: If a element attribute is set, tm have to be recalculated. That means reset the cashed values in tms
             for tm in self._tms:
                 tm._clean_cashed_values()
             return setattr(self.element, name, value)
@@ -59,9 +59,9 @@ class OpticElement:
 
     def R(self, energy):
         if self._tm_class_type == SecondTM:
-            return [tm.get_params(energy).R for tm in self._tms]
+            return [tm.get_params(energy).get_rotated_R() for tm in self._tms]
         else:
-            return [tm.get_params(energy).R for tm in self._first_order_tms]
+            return [tm.get_params(energy).get_rotated_R() for tm in self._first_order_tms]
 
     def T(self, energy):
         if self._tm_class_type == SecondTM:
@@ -102,7 +102,7 @@ class OpticElement:
         if tm != self._tm_class_type:
             if tm == self.default_tm:
                 self._tms = self._first_order_tms
-            else: 
+            else:
                 self.__init_tms(tm)
 
     def get_section_tms(self, delta_l: float, start_l: float = 0.0):

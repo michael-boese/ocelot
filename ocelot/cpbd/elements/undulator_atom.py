@@ -128,7 +128,7 @@ class UndulatorAtom(Element):
         return R
 
     def create_first_order_main_params(self, energy: float, delta_length: float = None) -> FirstOrderParams:
-        R = self.R_main_matrix(energy=energy, length=delta_length if delta_length else self.l)
+        R = self.R_main_matrix(energy=energy, length=delta_length if delta_length != None else self.l)
         B = self._default_B(R)
         return FirstOrderParams(R, B, self.tilt)
 

@@ -93,7 +93,7 @@ class KickTM(Transformation):
         dy = params.dy
 
         nkick = self.nkick
-        l = self.delta_length if self.delta_length else self.length
+        l = self.delta_length if self.delta_length != None else self.length
 
         if dx != 0 or dy != 0 or tilt != 0:
             X = transform_vec_ent(X, dx, dy, tilt)

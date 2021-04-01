@@ -31,5 +31,5 @@ class CorAtom(Element):
 
     def create_second_order_main_params(self, energy: float, delta_length: float) -> SecondOrderParams:
         params = self.create_first_order_main_params(energy, delta_length)
-        T = t_nnn(delta_length if delta_length else self.l, 0, 0, 0, energy)
+        T = t_nnn(delta_length if delta_length != None else self.l, 0, 0, 0, energy)
         return SecondOrderParams(params.R, params.B, T, self.tilt, self.dx, self.dy)

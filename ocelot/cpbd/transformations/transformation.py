@@ -83,7 +83,7 @@ class Transformation(ABC):
                 raise NotImplementedError(f"{'entrance' if tm_type == TMTypes.ENTRANCE else 'exit'} function is not set in {cls.__class__.__name__}'s __init__")
         except AttributeError:
             raise NotImplementedError(f"The specific element have to implement the function {tm_params_func.__name__}.")
-        if delta_length and (delta_length > length):
+        if delta_length != None and (delta_length > length):
             _logger.warning("delta_l > length of element. Set delta_l == length of element.")
             delta_length = length
         return cls(create_tm_param_func=tm_params_func, delta_e_func=delta_e_func, tm_type=tm_type, length=length, delta_length=delta_length, **params)
@@ -104,7 +104,7 @@ class Transformation(ABC):
             #self.map(prcl_series.rparticles, energy=prcl_series.E)
             prcl_series.E += self.get_delta_e()
             #prcl_series.E += self.delta_e
-            prcl_series.s += self.length
+            prcl_series.s += self.delta_length if self.delta_length != None else self.length
 
         elif prcl_series.__class__ == Particle:
             p = prcl_series
@@ -122,7 +122,7 @@ class Transformation(ABC):
                     self.map(np.array([[p.x], [p.px], [p.y], [p.py], [p.tau], [p.p]]), energy=p.E)
 
                     p.E += self.get_delta_e()
-                    p.s += self.length
+                    p.s += self.delta_length if self.delta_length != None else self.length
             else:
                 pa = ParticleArray()
                 pa.list2array(prcl_series)
@@ -130,7 +130,7 @@ class Transformation(ABC):
                 #self.map(pa.rparticles, energy=pa.E)
                 self.map_function()(pa.rparticles, energy=pa.E)
                 pa.E += self.get_delta_e()
-                pa.s += self.length
+                pa.s += self.delta_length if self.delta_length != None else self.length
                 pa.array2ex_list(prcl_series)
 
         else:

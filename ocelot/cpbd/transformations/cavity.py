@@ -21,7 +21,7 @@ class CavityTM(TransferMap):
 
     def map4cav(self, X, E, delta_length, length):
         params = self.get_params(E)
-        if delta_length:
+        if delta_length != None:
             V = params.v * delta_length / length if length != 0 else params.v
             z = delta_length
         else:

@@ -86,18 +86,14 @@ def lattice_transfer_map(lattice, energy):
     Ra = np.eye(6)
     Ta = np.zeros((6, 6, 6))
     Ba = np.zeros((6, 1))
-
-    for i, elem in enumerate(lattice.sequence):
-        Rb = elem.transfer_map.R(E)
-        Bb = elem.transfer_map.B(E)
-        if isinstance(elem.transfer_map, SecondTM):
-            Tb = elem.transfer_map.calculate_Tb(E)
+    E = energy
+    for elem in lattice.sequence:
+        for Rb, Bb, Tb, tm in zip(elem.R(E), elem.B(E), elem.T(E), elem.tms):
             Ra, Ta = transfer_maps_mult(Ra, Ta, Rb, Tb)
-        else:
-            Ra, Ta = transfer_maps_mult(Ra, Ta, Rb, Tb=np.zeros((6, 6, 6)))
+            Ba = np.dot(Rb, Ba) + Bb
+            E += tm.get_delta_e()
 
-        Ba = np.dot(Rb, Ba) + Bb
-        E += elem.transfer_map.delta_e
+    # TODO: Adding Attributes at runtime should be avoided
     lattice.E = E
     lattice.T_sym = Ta
     lattice.T = unsym_matrix(deepcopy(Ta))

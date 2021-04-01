@@ -38,4 +38,4 @@ class RungeKuttaTM(TransferMap):
 
     def map_function(self, delta_length=None, length=None):
         params = self.get_params()
-        return lambda X, energy: rk_field(X, self.s_start, self.delta_length if self.delta_length else self.length, self.npoints, energy, params.mag_field, self.long_dynamics)
+        return lambda X, energy: rk_field(X, self.s_start, self.delta_length if self.delta_length != None else self.length, self.npoints, energy, params.mag_field, self.long_dynamics)
