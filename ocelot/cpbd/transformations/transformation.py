@@ -48,7 +48,6 @@ class Transformation(ABC):
         self._current_energy = None  # used for caching tm params
         self._params = None
 
-
     def get_delta_e(self):
         if self._delta_e_func:
             return self._delta_e_func(delta_length=self.delta_length, total_length=self.length)
@@ -128,7 +127,8 @@ class Transformation(ABC):
                 pa = ParticleArray()
                 pa.list2array(prcl_series)
                 pa.E = prcl_series[0].E
-                self.map(pa.rparticles, energy=pa.E)
+                #self.map(pa.rparticles, energy=pa.E)
+                self.map_function()(pa.rparticles, energy=pa.E)
                 pa.E += self.get_delta_e()
                 pa.s += self.length
                 pa.array2ex_list(prcl_series)
@@ -150,4 +150,3 @@ class Transformation(ABC):
         :rtype: Callable[np.ndarray, float]
         """
         raise NotImplementedError()
-
