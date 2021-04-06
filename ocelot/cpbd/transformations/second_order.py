@@ -28,11 +28,12 @@ class SecondTM(Transformation):
         self.multiplication(X, params.R, params.T)
         if params.dx != 0 or params.dy != 0 or params.tilt != 0:
             X = transform_vec_ext(X, params.dx, params.dy, params.tilt)
-
+        # TODO: Add zero order tm to remove CorrectorTM. Could this be a performance problem?
+        X[:] = np.add(X, params.B)
         return X
 
-    def map_function(self, delta_length=None, length=None):
-        return lambda X, energy: self.t_apply(energy, X)
+    def map_function(self, X, energy: float):
+        return self.t_apply(energy, X)
 
     def calculate_Tb(self, energy) -> np.ndarray:
         """

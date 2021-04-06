@@ -103,5 +103,5 @@ class KickTM(Transformation):
 
         return X
 
-    def map_function(self, delta_length=None, length=None):
-        return lambda X, energy: self.kick_apply(X, energy)
+    def map_function(self, X, energy: float):
+        return self.kick_apply(X, energy)

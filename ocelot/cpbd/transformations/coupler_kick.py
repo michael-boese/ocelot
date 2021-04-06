@@ -33,8 +33,8 @@ class CouplerKickTM(TransferMap):
         X[:] = X1[:]
         return X
 
-    def map_function(self, delta_length=None, length=None):
-        return lambda X, energy: self.kick(X, self.v, self.phi, energy)
+    def map_function(self, X, energy: float):
+        return self.kick(X, self.v, self.phi, energy)
 
     @classmethod
     def create_from_element(cls, element, params=None):

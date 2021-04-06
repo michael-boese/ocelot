@@ -100,7 +100,7 @@ class Transformation(ABC):
         :return: None
         """
         if prcl_series.__class__ == ParticleArray:
-            self.map_function(self.length, self.delta_length)(prcl_series.rparticles, energy=prcl_series.E)
+            self.map_function(prcl_series.rparticles, energy=prcl_series.E)
             #self.map(prcl_series.rparticles, energy=prcl_series.E)
             prcl_series.E += self.get_delta_e()
             #prcl_series.E += self.delta_e
@@ -128,7 +128,7 @@ class Transformation(ABC):
                 pa.list2array(prcl_series)
                 pa.E = prcl_series[0].E
                 #self.map(pa.rparticles, energy=pa.E)
-                self.map_function()(pa.rparticles, energy=pa.E)
+                self.map_function(pa.rparticles, energy=pa.E)
                 pa.E += self.get_delta_e()
                 pa.s += self.delta_length if self.delta_length != None else self.length
                 pa.array2ex_list(prcl_series)

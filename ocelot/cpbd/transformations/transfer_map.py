@@ -35,13 +35,13 @@ class TransferMap(Transformation):
     # def map(self, func):
     #     self._map = func
 
-    def map_function(self, delta_length=None, length=None):
+    def map_function(self, X, energy: float):
         """
         This function calculate the map function which can be overload if the map function is different to the first order mapping  
-        @param delta_length: delta length of the element
-        @param length: total length of the element
+        @param X: Input Particle 
+        @param energy: Initial energy
         """
-        return lambda u, energy: self.mul_p_array(u, energy=energy)
+        return self.mul_p_array(X, energy=energy)
 
     def mul_p_array(self, rparticles, energy=0.):
         """

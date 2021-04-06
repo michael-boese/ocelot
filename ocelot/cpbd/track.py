@@ -1,5 +1,6 @@
 __author__ = 'Sergey Tomin'
 
+from ocelot.cpbd.transformations.transformation import TMTypes
 from ocelot.cpbd.optics import *
 from ocelot.cpbd.beam import *
 from ocelot.cpbd.errors import *
@@ -449,18 +450,15 @@ def track(lattice, p_array, navi, print_progress=True, calc_tws=True, bounds=Non
     return tws_track, p_array
 
 
-# TODO: Special treadment Edge and Bends
+
 def lattice_track(lat, p):
     plist = [copy.copy(p)]
-
     for elem in lat.sequence:
-        elem.transfer_map.apply([p])
-        #print(p)
-        if not (elem.__class__ in [Bend, RBend, SBend] and elem.l != 0.): #, "hcor", "vcor"
-            if elem.__class__ == Edge:
-                #print elem.pos
-                if elem.pos == 1:
-                    continue
+        for tm in elem.tms:
+            # TODO: Question: Why we have to split it like this?
+            if tm.tm_type == TMTypes.EXIT:
+                plist.append(copy.copy(p))
+            tm.apply([p])
         plist.append(copy.copy(p))
     return plist
 

@@ -69,8 +69,8 @@ class CavityTM(TransferMap):
 
         return X
 
-    def map_function(self, length: float = None, delta_length: float = None):
+    def map_function(self, X, energy: float):
         if self.tm_type == TMTypes.MAIN:
-            return lambda X, energy: self.map4cav(X, energy, delta_length, length)
+            return self.map4cav(X, energy, self.delta_length, self.length)
         else:
-            return lambda X, energy: self.mul_p_array(X, energy=energy)
+            return self.mul_p_array(X, energy=energy)

@@ -51,6 +51,10 @@ class OpticElement:
     def tms(self):
         return self._tms
 
+    @property
+    def first_order_tms(self):
+        return self._first_order_tms
+
     def B(self, energy):
         if self._tm_class_type == SecondTM:
             return [tm.get_params(energy).B for tm in self._tms]
