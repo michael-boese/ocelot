@@ -34,5 +34,5 @@ class Multipole(Element):
         r[1, 0] = -self.kn[1]
         r[3, 2] = self.kn[1]
         r[1, 5] = self.kn[0]
-        r_z_e = lambda z, energy: r
+        def r_z_e(z, energy): return r
         return r_z_e

@@ -115,7 +115,7 @@ def trace_z(lattice, obj0, z_array):
     obj_elem = obj0
     for z in z_array:
         while z > L:
-            for tm in lattice.sequence[i].tms:
+            for tm in lattice.sequence[i].first_order_tms:
                 obj_elem = tm * obj_elem
             i += 1
             elem = lattice.sequence[i]

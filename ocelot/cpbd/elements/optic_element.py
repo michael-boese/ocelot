@@ -1,4 +1,5 @@
 from copy import copy
+from ocelot.cpbd.transformations.transfer_map import TransferMap
 from typing import List, Dict, Type
 
 
@@ -63,7 +64,7 @@ class OpticElement:
 
     def R(self, energy):
         if self._tm_class_type == SecondTM:
-            return [tm.get_params(energy).get_rotated_R() for tm in self._tms]
+            return [tm.get_params(energy).R for tm in self._tms]
         else:
             return [tm.get_params(energy).get_rotated_R() for tm in self._first_order_tms]
 
@@ -109,18 +110,18 @@ class OpticElement:
             else:
                 self.__init_tms(tm)
 
-    def get_section_tms(self, delta_l: float, start_l: float = 0.0):
+    def get_section_tms(self, delta_l: float, start_l: float = 0.0, ignore_edges=False):
         #tms = [TMTypes.ROT_ENTRANCE]
         tm_list = []
         total_length = self.element.l
         if start_l < 1e-10:
-            if self.element.has_edge:
+            if self.element.has_edge and not ignore_edges:
                 tm = self.get_tm(TMTypes.ENTRANCE)
                 tm_list.append(copy(tm))
             if np.isclose(delta_l, total_length):
                 tm = self.get_tm(TMTypes.MAIN)
                 tm_list.append(copy(tm))
-                if self.element.has_edge:
+                if self.element.has_edge and not ignore_edges:
                     tm = self.get_tm(TMTypes.EXIT)
                     tm_list.append(copy(tm))
                 return tm_list
@@ -129,7 +130,7 @@ class OpticElement:
             delta_l_red = total_length - start_l
             TM_Class = self.get_tm(TMTypes.MAIN).__class__
             tm_list.append(TM_Class.from_element(element=self.element, tm_type=TMTypes.MAIN, delta_l=delta_l_red))
-            if self.element.has_edge:
+            if self.element.has_edge and not ignore_edges:
                 tm = self.get_tm(TMTypes.EXIT)
                 tm_list.append(copy(tm))
         else:
