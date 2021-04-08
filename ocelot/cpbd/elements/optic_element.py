@@ -9,6 +9,7 @@ from ocelot.cpbd.elements.element import Element
 from ocelot.cpbd.transformations import second_order
 from ocelot.cpbd.transformations.transformation import Transformation, TMTypes
 from ocelot.cpbd.transformations.second_order import SecondTM
+from ocelot.cpbd.transformations.transfer_map import TransferMap
 
 
 class OpticElement:
@@ -18,11 +19,11 @@ class OpticElement:
 
     __is_init = False  # needed to disable __getattr__ and __setattr__ until __init__ is executed
 
-    def __init__(self, element: Element, tm: Type[Transformation], default_tm: Transformation) -> None:
+    def __init__(self, element: Element, tm: Type[Transformation], default_tm: Type[Transformation]) -> None:
         self.element = element
         self.default_tm = default_tm
-        self._first_order_tms = self._create_tms(self.element, default_tm)  # every optics element has a first_order tm to calculate e.g Twiss Paramters
-        if default_tm == tm:
+        self._first_order_tms = self._create_tms(self.element, TransferMap)  # every optics element has a first_order tm to calculate e.g Twiss Paramters
+        if tm == TransferMap:
             self._tms = self._first_order_tms
             self._tm_class_type = tm
         else:
@@ -110,19 +111,32 @@ class OpticElement:
             else:
                 self.__init_tms(tm)
 
-    def get_section_tms(self, delta_l: float, start_l: float = 0.0, ignore_edges=False):
+    def get_section_tms(self, delta_l: float, start_l: float = 0.0, ignore_edges=False, first_order_only=False) -> List[Transformation]:
+        """[summary]
+        Calculates transformations for a section of the Element. The section is defined by start_l and delta_l.
+        :param delta_l: The length of the section.
+        :type delta_l: float
+        :param start_l: Start position in the element, defaults to 0.0
+        :type start_l: float, optional
+        :param ignore_edges: Ingore the Entrance- and Exist-Transformations if True, defaults to False
+        :type ignore_edges: bool, optional
+        :param first_order_only: Returns the first order transforamtions if True, defaults to False
+        :type first_order_only: bool, optional
+        :return: A List of Transformation for the section. 
+        :rtype: List[Transformation]
+        """
         #tms = [TMTypes.ROT_ENTRANCE]
         tm_list = []
         total_length = self.element.l
         if start_l < 1e-10:
             if self.element.has_edge and not ignore_edges:
-                tm = self.get_tm(TMTypes.ENTRANCE)
+                tm = self.get_tm(TMTypes.ENTRANCE, first_order_only)
                 tm_list.append(copy(tm))
             if np.isclose(delta_l, total_length):
-                tm = self.get_tm(TMTypes.MAIN)
+                tm = self.get_tm(TMTypes.MAIN, first_order_only)
                 tm_list.append(copy(tm))
                 if self.element.has_edge and not ignore_edges:
-                    tm = self.get_tm(TMTypes.EXIT)
+                    tm = self.get_tm(TMTypes.EXIT, first_order_only)
                     tm_list.append(copy(tm))
                 return tm_list
 
@@ -131,16 +145,17 @@ class OpticElement:
             TM_Class = self.get_tm(TMTypes.MAIN).__class__
             tm_list.append(TM_Class.from_element(element=self.element, tm_type=TMTypes.MAIN, delta_l=delta_l_red))
             if self.element.has_edge and not ignore_edges:
-                tm = self.get_tm(TMTypes.EXIT)
+                tm = self.get_tm(TMTypes.EXIT, first_order_only)
                 tm_list.append(copy(tm))
         else:
-            TM_Class = self.get_tm(TMTypes.MAIN).__class__
+            TM_Class = self.get_tm(TMTypes.MAIN, first_order_only).__class__
             tm_list.append(TM_Class.from_element(element=self.element, tm_type=TMTypes.MAIN, delta_l=delta_l))
         # tms.append(TMTypes.ROT_EXIT)
         return tm_list
 
-    def get_tm(self, tm_type: TMTypes):
-        for tm in self._tms:
+    def get_tm(self, tm_type: TMTypes, first_order_only=False):
+        tms = self._first_order_tms if first_order_only else self._tms
+        for tm in tms:
             if tm.tm_type == tm_type:
                 return tm
 

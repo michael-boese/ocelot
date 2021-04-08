@@ -1,9 +1,9 @@
 import logging
 
+from ocelot.cpbd.transformations.transformation import Transformation
 from ocelot.cpbd.elements.cavity_atom import CavityAtom
 from ocelot.cpbd.elements.optic_element import OpticElement
 from ocelot.cpbd.transformations.cavity import CavityTM
-from ocelot.cpbd.transformations.transfer_map import TransferMap
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +19,12 @@ class Cavity(OpticElement):
     """
 
     def __init__(self, l=0., v=0., phi=0., freq=0., vx_up=0, vy_up=0, vxx_up=0, vxy_up=0,
-                 vx_down=0, vy_down=0, vxx_down=0, vxy_down=0, eid=None, tm=CavityTM):  # tm=CavityTM):
+                 vx_down=0, vy_down=0, vxx_down=0, vxy_down=0, eid=None, tm=CavityTM):
+        if tm != CavityTM:
+            logger.debug("Cavity Element only support CavityTM as its transformation. Set tm to CavityTM.")
+            tm = CavityTM
         super().__init__(CavityAtom(l=l, v=v, phi=phi, freq=freq, vx_up=vx_up, vy_up=vy_up, vxx_up=vxx_up, vxy_up=vxy_up,
                                     vx_down=vx_down, vy_down=vy_down, vxx_down=vxx_down, vxy_down=vxy_down, eid=eid), tm=tm, default_tm=CavityTM)
+
+    def set_tm(self, tm: Transformation):
+        logger.debug("Cavity Element only support CavityTM as its transformation. Set tm to CavityTM.")

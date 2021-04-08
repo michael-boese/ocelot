@@ -170,35 +170,32 @@ class CavityAtom(Element):
         b = np.array([[0.], [dxp], [0.], [dyp], [0.], [0.]])
         return b
 
-    def create_cavity_tm_main_params(self, energy: float, delta_length: float) -> CavityParams:
+    def create_first_order_main_params(self, energy: float, delta_length: float) -> FirstOrderParams:
         R = self._R_main_matrix(energy=energy, length=delta_length if delta_length != None else self.l)
         B = self._default_B(R)
-        return CavityParams(R=R, B=B, tilt=self.tilt, v=self.v, freq=self.freq, phi=self.phi)
+        return FirstOrderParams(R, B, self.tilt)
+
+    def create_first_order_entrance_params(self, energy: float, delta_length: float) -> FirstOrderParams:
+        R = self._R_edge_matrix(energy=energy, vxx=self.vxx_up, vxy=self.vxy_up)
+        B = self._default_B(R)
+        return FirstOrderParams(R, B, self.tilt)
+
+    def create_first_order_exit_params(self, energy: float, delta_length: float) -> FirstOrderParams:
+        R = self._R_edge_matrix(energy=energy, vxx=self.vxx_down, vxy=self.vxy_down)
+        B = self._default_B(R)
+        return FirstOrderParams(R, B, self.tilt)
+
+    def create_cavity_tm_main_params(self, energy: float, delta_length: float) -> CavityParams:
+        fo_params = self.create_first_order_main_params(energy, delta_length)
+        return CavityParams(R=fo_params.R, B=fo_params.B, tilt=self.tilt, v=self.v, freq=self.freq, phi=self.phi)
 
     def create_cavity_tm_entrance_params(self, energy: float, delta_length: float) -> CavityParams:
-        R = self._R_edge_matrix(energy=energy, vxx=self.vxx_up, vxy=self.vxy_up)
-        B = self.kick_b(self.v, self.vx_up, self.vy_up, self.phi, energy)
-        return CavityParams(R=R, B=B, tilt=self.tilt, v=self.v, freq=self.freq, phi=self.phi)
+        fo_params = self.create_first_order_entrance_params(energy, delta_length)
+        return CavityParams(R=fo_params.R, B=fo_params.B, tilt=self.tilt, v=self.v, freq=self.freq, phi=self.phi)
 
     def create_cavity_tm_exit_params(self, energy: float, delta_length: float) -> CavityParams:
-        R = self._R_edge_matrix(energy=energy, vxx=self.vxx_down, vxy=self.vxy_down)
-        B = self.kick_b(self.v, self.vx_down, self.vy_down, self.phi, energy)
-        return CavityParams(R=R, B=B, tilt=self.tilt, v=self.v, freq=self.freq, phi=self.phi)
-
-    # def create_first_order_main_params(self, energy: float, delta_length: float) -> FirstOrderParams:
-    #     R = self._R_main_matrix(energy=energy, length=delta_length if delta_length != None else self.l)
-    #     B = self._default_B(R)
-    #     return FirstOrderParams(R, B, self.tilt)
-
-    # def create_first_order_entrance_params(self, energy: float, delta_length: float) -> FirstOrderParams:
-    #     R = self._R_edge_matrix(energy=energy, vxx=self.vxx_up, vxy=self.vxy_up)
-    #     B = self._default_B(R)
-    #     return FirstOrderParams(R, B, self.tilt)
-
-    # def create_first_order_exit_params(self, energy: float, delta_length: float) -> FirstOrderParams:
-    #     R = self._R_edge_matrix(energy=energy, vxx=self.vxx_down, vxy=self.vxy_down)
-    #     B = self._default_B(R)
-    #     return FirstOrderParams(R, B, self.tilt)
+        fo_params = self.create_first_order_exit_params(energy, delta_length)
+        return CavityParams(R=fo_params.R, B=fo_params.B, tilt=self.tilt, v=self.v, freq=self.freq, phi=self.phi)
 
     def create_delta_e(self, total_length, delta_length=None) -> float:
         if delta_length != None:

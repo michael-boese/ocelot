@@ -1,6 +1,7 @@
 __author__ = 'Sergey'
 
 from copy import deepcopy
+from ocelot.cpbd.transformations.multipole import MultipoleTM
 from ocelot.cpbd.tm_params.second_order_params import SecondOrderParams
 
 from numpy.linalg import inv
@@ -58,10 +59,10 @@ class MethodTM:
             res['global'] = self.global_method
         if not self.params.get('nKick') != self.nkick:
             res['nkick'] = self.nkick
-        
+
         # OLD BEHAVIOR: old CorrectorTM has been splitted in First Order and Second Order to keep
         # the old behavior VCor's and Hcor's tm is set to SecondTM which is equal to
-        # the old CorrectorTM. 
+        # the old CorrectorTM.
         if not res.get('Vcor'):
             res['Vcor'] = SecondTM
 
@@ -122,10 +123,10 @@ def trace_z(lattice, obj0, z_array):
             L += elem.l
 
         delta_l = z - (L - elem.l)
-        tms = elem.get_section_tms(start_l=0.0, delta_l=delta_l)
+        first_order_tms = elem.get_section_tms(start_l=0.0, delta_l=delta_l, first_order_only=True)
 
         obj_z = obj_elem
-        for tm in tms:
+        for tm in first_order_tms:
             obj_z = tm * obj_z
 
         obj_list.append(obj_z)

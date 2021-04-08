@@ -25,16 +25,6 @@ class TransferMap(Transformation):
                           exit_tm_params_func=element.create_first_order_exit_params if element.has_edge else None,
                           tm_type=tm_type, length=element.l, delta_length=delta_l)
 
-    # @property
-    # def map(self):
-    #     if not self._map:
-    #         self._map = self.map_function()
-    #     return self._map
-
-    # @map.setter
-    # def map(self, func):
-    #     self._map = func
-
     def map_function(self, X, energy: float):
         """
         This function calculate the map function which can be overload if the map function is different to the first order mapping  
@@ -75,16 +65,6 @@ class TransferMap(Transformation):
                 " TransferMap.__mul__: unknown object in transfer map multiplication: " + str(m.__class__.__name__))
             raise Exception(
                 " TransferMap.__mul__: unknown object in transfer map multiplication: " + str(m.__class__.__name__))
-
-    # TODO: Refactor old style
-    # def __call__(self, delta_length):
-    #     m = copy(self)
-    #     m.R = lambda energy: m.R_z(delta_length, energy)
-    #     m.B = lambda energy: m.B_z(delta_length, energy)
-    #     m.delta_e = m.delta_e_z(delta_length)
-    #     m.map = m.map_function(delta_length=delta_length, length=self.length)
-    #     m.length = delta_length
-    #     return m
 
     @classmethod
     def create_from_element(cls, element, params=None):
