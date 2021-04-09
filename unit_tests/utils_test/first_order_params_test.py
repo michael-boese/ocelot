@@ -9,6 +9,7 @@ from ocelot.cpbd.elements.monitor_atom import MonitorAtom
 from ocelot.cpbd.elements.quadrupole_atom import QuadrupoleAtom
 from ocelot.cpbd.elements.sbend_atom import SBendAtom
 from ocelot.cpbd.elements.rbend_atom import RBendAtom
+from ocelot.cpbd.elements.bend_atom import BendAtom
 from ocelot.cpbd.elements.undulator_atom import UndulatorAtom
 from ocelot.cpbd.elements.cavity_atom import CavityAtom
 from ocelot.cpbd.elements.sextupole_atom import SextupoleAtom
@@ -56,10 +57,24 @@ def test_first_order_rbend_exit(load_ground_truth_data):
     first_order_test(RBendAtom(**params), 'RBend_E2', load_ground_truth_data, tm_type=TMTypes.EXIT)
 
 
+def test_first_order_bend_entrance(load_ground_truth_data):
+    params = load_ground_truth_data.get_params('Bend')
+    first_order_test(BendAtom(**params), 'Bend_E1', load_ground_truth_data, tm_type=TMTypes.ENTRANCE)
+
+
+def test_first_order_bend_main(load_ground_truth_data):
+    params = load_ground_truth_data.get_params('Bend')
+    first_order_test(BendAtom(**params), 'Bend', load_ground_truth_data)
+
+
+def test_first_order_bend_exit(load_ground_truth_data):
+    params = load_ground_truth_data.get_params('Bend')
+    first_order_test(BendAtom(**params), 'Bend_E2', load_ground_truth_data, tm_type=TMTypes.EXIT)
+
 
 def test_first_order_sbend_entrance(load_ground_truth_data):
-    first_order_test(SBendAtom(l=0.200102663853, angle=-0.1109740393, e1=-0.05548702, e2=0.05548702, tilt=1.570796327,
-                               fint=0.0, eid='BL.73.I1'), 'SBend_E1', load_ground_truth_data, tm_type=TMTypes.ENTRANCE)
+    first_order_test(BendAtom(l=0.200102663853, angle=-0.1109740393, e1=-0.05548702, e2=0.05548702, tilt=1.570796327,
+                              fint=0.0, eid='BL.73.I1'), 'SBend_E1', load_ground_truth_data, tm_type=TMTypes.ENTRANCE)
 
 
 def test_first_order_sbend_main(load_ground_truth_data):

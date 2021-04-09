@@ -4,6 +4,7 @@ import numpy as np
 
 from ocelot.cpbd.elements.drift import Drift
 from ocelot.cpbd.elements.sbend import SBend
+from ocelot.cpbd.elements.sextupole import Sextupole
 from ocelot.cpbd.transformations.kick import KickTM
 from ocelot.cpbd.io import load_particle_array
 
@@ -32,4 +33,15 @@ def test_kick_tm_with_sbend():
     for i, tm in enumerate(drift.tms):
         tm.apply(p_array)
         ground_truth = load_particle_array(f"unit_tests/test_data/kick_tm/kick_tm_SBend_output_{i}.npz")
+        compare_p_array(p_array, ground_truth)    
+
+
+def test_kick_tm_with_sextupole():
+    p_array = load_particle_array("unit_tests/test_data/init_beam.npz")
+    with open("unit_tests/test_data/kick_tm/kick_tm_Sextupole_output.json") as fs:
+        params = json.load(fs)
+    drift = Sextupole(**params, tm=KickTM)
+    for i, tm in enumerate(drift.tms):
+        tm.apply(p_array)
+        ground_truth = load_particle_array(f"unit_tests/test_data/kick_tm/kick_tm_Sextupole_output_{i}.npz")
         compare_p_array(p_array, ground_truth)    
