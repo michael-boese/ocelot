@@ -685,6 +685,12 @@ class ParticleArray:
             self.lp_to_pos_hist.append((position, len(inds)))
             self._current_particle = np.delete(self._current_particle, inds)
 
+        def initial_idx_2_p_idx(self, idx):
+            found_idx = np.where(self._current_particle == idx)[0]
+            if found_idx.size > 0:
+                return found_idx[0]
+            return None
+
     def __init__(self, n=0):
         self.rparticles = np.zeros((6, n))
         self.q_array = np.zeros(n)  # charge
@@ -707,7 +713,7 @@ class ParticleArray:
                                                                                 np.append(np.argwhere(y != y),
                                                                                           ind_angles)))))
         # e_idxs = [append([], x) for x in array([6*p_idxs, 6*p_idxs+1, 6*p_idxs+2, 6*p_idxs+3, 6*p_idxs+4, 6*p_idxs+5])]
-        self.rparticles = np.delete(self.rparticles, p_idxs, axis=1)
+        self.delete_particles(p_idxs)
         return p_idxs
 
     def __getitem__(self, idx):
@@ -732,6 +738,7 @@ class ParticleArray:
             self[i] = p
         self.s = p_list[0].s
         self.E = p_list[0].E
+        self.lost_particle_recorder = self.LostParticleRecorder(len(p_list))
 
     def array2list(self):
         p_list = []
