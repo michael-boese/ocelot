@@ -177,12 +177,12 @@ class CavityAtom(Element):
 
     def create_first_order_entrance_params(self, energy: float, delta_length: float) -> FirstOrderParams:
         R = self._R_edge_matrix(energy=energy, vxx=self.vxx_up, vxy=self.vxy_up)
-        B = self._default_B(R)
+        B = self.kick_b(self.v, self.vx_up, self.vy_up, self.phi, energy)
         return FirstOrderParams(R, B, self.tilt)
 
     def create_first_order_exit_params(self, energy: float, delta_length: float) -> FirstOrderParams:
         R = self._R_edge_matrix(energy=energy, vxx=self.vxx_down, vxy=self.vxy_down)
-        B = self._default_B(R)
+        B = self.kick_b(self.v, self.vx_down, self.vy_down, self.phi, energy)
         return FirstOrderParams(R, B, self.tilt)
 
     def create_cavity_tm_main_params(self, energy: float, delta_length: float) -> CavityParams:
