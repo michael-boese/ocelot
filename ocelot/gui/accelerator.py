@@ -181,7 +181,6 @@ dict_plot = {Quadrupole: {"scale": 0.7, "color": "r", "edgecolor": "r", "label":
              Vcor: {"scale": 0.7, "color": "c", "edgecolor": "c", "label": "cor"},
              Drift: {"scale": 0., "color": "k", "edgecolor": "k", "label": ""},
              Marker: {"scale": 0., "color": "k", "edgecolor": "k", "label": "mark"},
-             Edge: {"scale": 0., "color": "k", "edgecolor": "k", "label": ""},
              Solenoid: {"scale": 0.7, "color": "g", "edgecolor": "g", "label": "sol"},
              TDCavity: {"scale": 0.7, "color": "magenta", "edgecolor": "g", "label": "tds"},
              UnknownElement: {"scale": 0.7, "color": "g", "edgecolor": "g", "label": "unk"},
@@ -248,7 +247,7 @@ def plot_elems(fig, ax, lat, s_point=0, y_lim=None, y_scale=1, legend=True, font
         if elem.__class__ in excld_legend:
             elem = Drift(l=elem.l)
 
-        if elem.__class__ in [Marker, Edge, CouplerKick]:
+        if elem.__class__ == Marker:
             L += elem.l
             continue
         l = elem.l

@@ -10,45 +10,7 @@ from ocelot.cpbd.elements import *
 from ocelot.cpbd.transformations.transformation import TMTypes
 
 
-def edge_chromaticity_old(lattice, tws_0):
-    # tested !
-    ksi_x_edge = 0.
-    ksi_y_edge = 0.
-    L = 0.
-    for element in lattice.sequence:
-        L += element.l
-        if element.type == "rbend":
-            r = element.l/element.angle
-            tw_start = trace_z(lattice, tws_0, [(L - element.l)])
-            tw_end = trace_z(lattice, tws_0, [L])
-            # print "*************    ", tw_start, tw_end
-            ksi_x_edge += (tw_start.beta_x + tw_end.beta_x)*np.tan(element.angle/2)/r
-            ksi_y_edge += (tw_start.beta_y + tw_end.beta_y)*np.tan(-element.angle/2)/r
-    return (ksi_x_edge, ksi_y_edge)
-
-
-def edge_chromaticity(lattice, tws_0):
-    # not tested!
-    ksi_x_edge = 0.
-    ksi_y_edge = 0.
-    L = 0.
-    tws_elem = tws_0
-    for element in lattice.sequence:
-        L += element.l
-        tws_elem = element.transfer_map * tws_elem
-        if element.type == Edge:
-            #r = element.l/element.angle
-            #tw_start = trace_z(lattice, tws_0, [(L - element.l)])
-            # print element.id
-            #tw_end = trace_z(lattice,tws_0,[L])
-            # print "*************    ", tw_start, tw_end
-            ksi_x_edge += tws_elem.beta_x*np.tan(element.edge)*element.h
-            ksi_y_edge += tws_elem.beta_y*np.tan(-element.edge)*element.h
-    return np.array([ksi_x_edge, ksi_y_edge])
-
-
 def natural_chromaticity(lattice, tws_0, nsuperperiod=1):
-    #edge_ksi_x, edge_ksi_y = edge_chromaticity(lattice, tws_0)
     edge_ksi_x, edge_ksi_y = 0, 0
     tws_elem = tws_0
     #M = TransferMap()
@@ -93,7 +55,6 @@ def natural_chromaticity(lattice, tws_0, nsuperperiod=1):
 
 
 def sextupole_chromaticity(lattice, tws0, nsuperperiod=1):
-    #edge_ksi_x, edge_ksi_y = edge_chromaticity(lattice, tws_0)
     tws_elem = tws0
 
     integr_x = 0.

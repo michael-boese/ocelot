@@ -1,6 +1,5 @@
 import numpy as np
 
-from ocelot.cpbd.transformations.v_corrector import VCorrectorTM
 from ocelot.cpbd.elements.optic_element import OpticElement
 from ocelot.cpbd.elements.vcor_atom import VcorAtom
 from ocelot.cpbd.transformations.transfer_map import TransferMap

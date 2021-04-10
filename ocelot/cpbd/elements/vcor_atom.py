@@ -1,7 +1,6 @@
 import numpy as np
 
 from ocelot.cpbd.r_matrix import uni_matrix
-from ocelot.cpbd.transformations.v_corrector import VCorrectorTM
 from ocelot.cpbd.elements.cor_atom import CorAtom
 from ocelot.cpbd.tm_params.first_order_params import FirstOrderParams
 
