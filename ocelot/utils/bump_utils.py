@@ -5,7 +5,7 @@ S.Tomin, DESY, 11.2020
 from typing import Union, List
 import numpy as np
 import copy
-from ocelot.cpbd.elements import Element, Monitor, Marker, Hcor, Vcor, Bend, Edge
+from ocelot.cpbd.elements import Element, Monitor, Marker, Hcor, Vcor, Bend
 from ocelot.cpbd.magnetic_lattice import MagneticLattice
 from ocelot.cpbd.optics import lattice_transfer_map
 from ocelot.cpbd.beam import Particle

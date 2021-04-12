@@ -150,7 +150,7 @@ def match(lat, constr, vars, tw, verbose=True, max_iter=1000, method='simplex', 
         tw_loc.s = 0
 
         for e in lat.sequence:
-            for tm in e.tms: 
+            for tm in e.first_order_tms:
                 tw_loc = tm * tw_loc
 
                 if 'global' in constr.keys():
@@ -356,19 +356,15 @@ def match_beam(lat, constr, vars, p_array, navi, verbose=True, max_iter=1000, me
                     return weights('negative_length')
                     pass
                 vars[i].l = x[i]
-                vars[i].create_tm()
             if vars[i].__class__ == Quadrupole:
                 vars[i].k1 = x[i]
-                vars[i].create_tm()
             if vars[i].__class__ == Solenoid:
                 vars[i].k = x[i]
-                vars[i].create_tm()
             if vars[i].__class__ in [RBend, SBend, Bend]:
                 if vary_bend_angle:
                     vars[i].angle = x[i]
                 else:
                     vars[i].k1 = x[i]
-                vars[i].create_tm()
             if vars[i].__class__ == list:
                 if vars[i][0].__class__ == Twiss and vars[i][1].__class__ == str:
                     k = vars[i][1]
@@ -376,7 +372,6 @@ def match_beam(lat, constr, vars, p_array, navi, verbose=True, max_iter=1000, me
             if vars[i].__class__ == tuple:  # all quads strength in tuple varied simultaneously
                 for v in vars[i]:
                     v.k1 = x[i]
-                    lat.method.create_tm(v)
 
         err = 0.0
         if "periodic" in constr.keys():
