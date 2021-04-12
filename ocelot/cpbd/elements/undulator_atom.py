@@ -1,10 +1,12 @@
 import logging
 
 import numpy as np
+
 from ocelot.cpbd.elements.element import Element
 from ocelot.cpbd.field_map import FieldMap
 from ocelot.cpbd.tm_params.first_order_params import FirstOrderParams
 from ocelot.cpbd.tm_params.runge_kutta_params import RungeKuttaParams
+from ocelot.cpbd.tm_params.undulator_test_params import UndulatorTestParams
 from ocelot.cpbd.high_order import m_e_GeV, m_e_eV
 from ocelot.common.globals import speed_of_light, pi
 
@@ -137,3 +139,6 @@ class UndulatorAtom(Element):
 
     def und_field(self):
         return lambda x, y, z: und_field(x, y, z, self.lperiod, self.Kx)
+
+    def create_undulator_test_tm_main_params(self) -> UndulatorTestParams:
+        return UndulatorTestParams(self.lperiod, self.Kx, self.ax)
