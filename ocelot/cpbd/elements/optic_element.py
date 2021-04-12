@@ -46,6 +46,8 @@ class OpticElement:
             # TODO: If a element attribute is set, tm have to be recalculated. That means reset the cashed values in tms
             for tm in self._tms:
                 tm._clean_cashed_values()
+            for tm in self._first_order_tms:
+                tm._clean_cashed_values()
             return setattr(self.element, name, value)
         return object.__setattr__(self, name, value)
 
