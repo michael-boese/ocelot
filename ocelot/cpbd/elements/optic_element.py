@@ -67,7 +67,7 @@ class OpticElement:
 
     def R(self, energy):
         if self._tm_class_type == SecondTM:
-            return [tm.get_params(energy).R for tm in self._tms]
+            return [tm.get_params(energy).get_rotated_R() for tm in self._tms]
         else:
             return [tm.get_params(energy).get_rotated_R() for tm in self._first_order_tms]
 
