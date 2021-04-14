@@ -42,6 +42,9 @@ class MatrixAtom(Element):
                 self.b[int(y[1]) - 1, 0] = float(kwargs[y])
         self.delta_e = delta_e
 
+    def create_delta_e(self, total_length, delta_length=0.0):
+        return self.delta_e
+
     def __str__(self):
         s = 'Matrix : '
         s += 'id = ' + str(self.id) + '\n'

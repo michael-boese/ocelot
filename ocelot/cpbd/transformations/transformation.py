@@ -108,7 +108,7 @@ class Transformation(ABC):
 
         elif prcl_series.__class__ == Particle:
             p = prcl_series
-            p.x, p.px, p.y, p.py, p.tau, p.p = self.map(np.array([[p.x], [p.px], [p.y], [p.py], [p.tau], [p.p]]), p.E)[
+            p.x, p.px, p.y, p.py, p.tau, p.p = self.map_function(np.array([[p.x], [p.px], [p.y], [p.py], [p.tau], [p.p]]), p.E)[
                 :, 0]
             p.s += self.length
             p.E += self.get_delta_e()

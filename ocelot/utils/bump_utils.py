@@ -119,8 +119,6 @@ def convert_cors2dipoles(lat: MagneticLattice, cor_list: List[Element], energy: 
                 if elem.id == d.id:
                     seq.append(d)
         else:
-            if elem.__class__ is Edge:
-                continue
             seq.append(elem)
     lat_new = MagneticLattice(seq)
 

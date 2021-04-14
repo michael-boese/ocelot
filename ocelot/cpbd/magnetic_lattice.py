@@ -81,12 +81,13 @@ def merger(lat, remaining_types=[], remaining_elems=[], init_energy=0.):
     E = init_energy
     for elem_list in lattice_analysis:
         if len(elem_list) == 1:
-            E += elem_list[0].transfer_map.delta_e
+            for tm in elem_list[0].tms:
+                E += tm.get_delta_e()
             seq.append(elem_list[0])
         elif len(elem_list) == 0:
             continue
         else:
-            delta_e = np.sum([elem.transfer_map.delta_e for elem in elem_list])
+            delta_e = np.sum([tm.get_delta_e() for elem in elem_list for tm in elem.tms])
             lattice = MagneticLattice(elem_list, method=lat.method)
             R = lattice_transfer_map(lattice, energy=E)
             m = Matrix()

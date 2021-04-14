@@ -112,6 +112,9 @@ class OpticElement:
                 self._tms = self._first_order_tms
             else:
                 self.__init_tms(tm)
+            self._tm_class_type = tm    
+            for tm in self._tms:
+                tm._clean_cashed_values()
 
     def get_section_tms(self, delta_l: float, start_l: float = 0.0, ignore_edges=False, first_order_only=False) -> List[Transformation]:
         """[summary]
