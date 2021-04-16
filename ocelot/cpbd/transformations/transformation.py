@@ -49,7 +49,7 @@ class Transformation(ABC):
         self._params = None
 
     def get_delta_e(self):
-        if self._delta_e_func:
+        if self._delta_e_func and self.tm_type == TMTypes.MAIN:  # Entrance and Exit tms (Edge TMs) don't have delta_e
             return self._delta_e_func(delta_length=self.delta_length, total_length=self.length)
         else:
             return 0.0
@@ -110,7 +110,7 @@ class Transformation(ABC):
             p = prcl_series
             p.x, p.px, p.y, p.py, p.tau, p.p = self.map_function(np.array([[p.x], [p.px], [p.y], [p.py], [p.tau], [p.p]]), p.E)[
                 :, 0]
-            p.s += self.length
+            p.s += self.delta_length if self.delta_length != None else self.length
             p.E += self.get_delta_e()
 
         elif prcl_series.__class__ == list and prcl_series[0].__class__ == Particle:
