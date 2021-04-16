@@ -13,14 +13,13 @@ from ocelot import RungeKuttaTM
 d1 = Drift(l=0.1)
 d2 = Drift(l=1)
 
-und = Undulator(lperiod=0.4, nperiods=9, Kx=44.81)
+und = Undulator(lperiod=0.4, nperiods=9, Kx=44.81, npoints=3000)
 und.mag_field = lambda x, y, z: und_field(x, y, z, und.lperiod, und.Kx)
-und.npoints = 3000
-
-
+#und.npoints = 3000
 
 
 """pytest fixtures definition"""
+
 
 @pytest.fixture(scope='module')
 def cell():
@@ -31,8 +30,8 @@ def cell():
 def method():
     m = {'global': SecondTM, 'Undulator': RungeKuttaTM}
     return m
-    
-    
+
+
 @pytest.fixture(scope='module')
 def lattice(cell, method):
     return MagneticLattice(cell, method=method)

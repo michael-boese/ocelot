@@ -21,7 +21,7 @@ class UndulatorTestTM(TransferMap):
                           main_tm_params_func=element.create_undulator_test_tm_main_params,
                           exit_tm_params_func=None,
                           has_params=False,
-                          tm_type=tm_type, length=element.l, delta_length=delta_l, params=params)
+                          tm_type=tm_type, length=element.l, delta_length=delta_l, **params)
 
     def get_params(self):
         return self.create_tm_param_func()

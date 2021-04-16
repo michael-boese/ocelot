@@ -31,7 +31,7 @@ class RungeKuttaTM(TransferMap):
                           delta_e_func=element.create_delta_e,
                           main_tm_params_func=element.create_runge_kutta_main_params,
                           exit_tm_params_func=element.create_runge_kutta_exit_params if element.has_edge else None,
-                          tm_type=tm_type, length=element.l, delta_length=delta_l, params=params)
+                          tm_type=tm_type, length=element.l, delta_length=delta_l, **params)
 
     def get_params(self):
         return self.create_tm_param_func()

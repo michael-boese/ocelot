@@ -19,15 +19,16 @@ class OpticElement:
 
     __is_init = False  # needed to disable __getattr__ and __setattr__ until __init__ is executed
 
-    def __init__(self, element: Element, tm: Type[Transformation], default_tm: Type[Transformation]) -> None:
+    def __init__(self, element: Element, tm: Type[Transformation], default_tm: Type[Transformation], **params) -> None:
         self.element = element
         self.default_tm = default_tm
         self._first_order_tms = self._create_tms(self.element, TransferMap)  # every optics element has a first_order tm to calculate e.g Twiss Paramters
+        self._kwargs = params # Storing transforamtion sp
         if tm == TransferMap:
             self._tms = self._first_order_tms
             self._tm_class_type = tm
         else:
-            self.__init_tms(tm)
+            self.__init_tms(tm, **params)
         self.__is_init = True  # needed to disable __getattr__ and __setattr__ in __init__ phase
 
         # self.__dict__['element'] = element
@@ -60,30 +61,41 @@ class OpticElement:
         return self._first_order_tms
 
     def B(self, energy):
-        if self._tm_class_type == SecondTM:
-            return [tm.get_params(energy).B for tm in self._tms]
-        else:
-            return [tm.get_params(energy).B for tm in self._first_order_tms]
+        tms = self._tms if self._tm_class_type == SecondTM else self._first_order_tms
+        res = []
+        E = energy
+        for tm in tms:
+            res.append(tm.get_params(E).B)
+            E += tm.get_delta_e()
+        return res
 
     def R(self, energy):
-        if self._tm_class_type == SecondTM:
-            return [tm.get_params(energy).get_rotated_R() for tm in self._tms]
-        else:
-            return [tm.get_params(energy).get_rotated_R() for tm in self._first_order_tms]
+        tms = self._tms if self._tm_class_type == SecondTM else self._first_order_tms
+        res = []
+        E = energy
+        for tm in tms:
+            res.append(tm.get_params(E).get_rotated_R())
+            E += tm.get_delta_e()
+        return res
 
     def T(self, energy):
-        if self._tm_class_type == SecondTM:
-            return [tm.get_params(energy).get_roteted_T() for tm in self._tms]
-        else:
+        if self._tm_class_type != SecondTM:
             return [np.zeros((6, 6, 6)) for _ in self._first_order_tms]
+        res = []
+        E = energy
+        for tm in self._tms:
+            res.append(tm.get_params(E).get_roteted_T())
+            E += tm.get_delta_e()
+        return res
 
-    def __init_tms(self, tm):
+
+    def __init_tms(self, tm, **params):
         try:
-            self._tms = self._create_tms(self.element, tm)
+            self._tms = self._create_tms(self.element, tm, **params)
             self._tm_class_type = tm
         except AttributeError as e:
             print(f"Can't set {tm.__name__} for {self.__class__.__name__} fall back to default tm which is {self.default_tm.__name__}.")
-            self._tms = self._create_tms(self.element, self.default_tm)
+            self._tms = self._create_tms(self.element, self.default_tm, **params)
             self._tm_class_type = self.default_tm
 
     def dot_tms(self, obj):
@@ -106,12 +118,18 @@ class OpticElement:
         for tm in self._tms:
             tm.map_function(X, energy)
 
-    def set_tm(self, tm: Transformation):
-        if tm != self._tm_class_type:
+    def set_tm(self, tm: Transformation, **params):
+        new_kwargs = params if params and params != self._kwargs else None
+        if tm != self._tm_class_type or new_kwargs:
             if tm == self.default_tm:
                 self._tms = self._first_order_tms
             else:
-                self.__init_tms(tm)
+                if new_kwargs:
+                    self.__init_tms(tm, **new_kwargs)
+                    self._kwargs = new_kwargs
+                else:
+                    self.__init_tms(tm, **self._kwargs)
+
             self._tm_class_type = tm    
             for tm in self._tms:
                 tm._clean_cashed_values()
@@ -165,15 +183,15 @@ class OpticElement:
                 return tm
 
     @staticmethod
-    def _create_tms(element: Element, tm: Type[Transformation]) -> Dict[TMTypes, Type[Transformation]]:
+    def _create_tms(element: Element, tm: Type[Transformation], **params) -> Dict[TMTypes, Type[Transformation]]:
         tms = []
         #tms = [tm.create(element, TMTypes.ROT_ENTRANCE)]
         if element.has_edge:
-            tms.append(tm.from_element(element, TMTypes.ENTRANCE))
-            tms.append(tm.from_element(element, TMTypes.MAIN))
-            tms.append(tm.from_element(element, TMTypes.EXIT))
+            tms.append(tm.from_element(element, TMTypes.ENTRANCE, **params))
+            tms.append(tm.from_element(element, TMTypes.MAIN, **params))
+            tms.append(tm.from_element(element, TMTypes.EXIT, **params))
         else:
-            tms.append(tm.from_element(element, TMTypes.MAIN))
+            tms.append(tm.from_element(element, TMTypes.MAIN, **params))
         #tms = [tm.create(element, TMTypes.ROT_EXIT)]
         return tms
 
