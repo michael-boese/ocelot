@@ -536,7 +536,6 @@ def get_map(lattice, dz, navi):
     while z1 + 1e-10 > L:
 
         dl = L - navi.z0
-        # TM.append(elem.transfer_map(dl))
         TM += elem.get_section_tms(start_l=navi.z0 + elem.l - L, delta_l=dl)
 
         navi.z0 = L
@@ -547,11 +546,10 @@ def get_map(lattice, dz, navi):
         i += 1
         elem = lattice.sequence[i]
         L += elem.l
-        # if i in navi.proc_kick_elems:
-        #    break
+        
     if abs(dz) > 1e-10:
         TM += elem.get_section_tms(start_l=navi.z0 + elem.l - L, delta_l=dz)
-        # TM.append(elem.transfer_map(dz))
+
     navi.z0 += dz
     navi.sum_lengths = L - elem.l
     navi.n_elem = i
