@@ -67,19 +67,23 @@ def sextupole_chromaticity(lattice, tws0, nsuperperiod=1):
             Z = []
 
             for z in np.linspace(0, elem.l, num=5, endpoint=True):
-                twiss_z = elem.transfer_map(z)*tws_elem
-                bx.append(twiss_z.beta_x)
-                by.append(twiss_z.beta_y)
-                Dx.append(twiss_z.Dx)
+                delta_tms = elem.get_section_tms(start_l=0.0, delta_l=z, first_order_only=True)
+                twiss_z = tws_elem
+                for tm in delta_tms:
+                    twiss_z = tm*twiss_z
+                    bx.append(twiss_z.beta_x)
+                    by.append(twiss_z.beta_y)
+                    Dx.append(twiss_z.Dx)
 
-                Z.append(z)
+                    Z.append(z)
 
             X = np.array(bx)*np.array(Dx)
             Y = np.array(by)*np.array(Dx)
             integr_x += simps(X, Z)*elem.k2
             integr_y += simps(Y, Z)*elem.k2
 
-        tws_elem = elem.transfer_map*tws_elem
+        for tm in elem.first_order_tms:
+            tws_elem = tm*tws_elem
     chrom_sex_x = (integr_x)/(4*pi)
     chrom_sex_y = -(integr_y)/(4*pi)
     return np.array([chrom_sex_x*nsuperperiod, chrom_sex_y*nsuperperiod])
