@@ -1,4 +1,3 @@
-from copy import deepcopy, copy
 import logging
 
 import numpy as np
@@ -10,10 +9,15 @@ _logger = logging.getLogger(__name__)
 
 
 class TransferMap(Transformation):
+    """[summary]
+    Implementation of the first oder transformation.
+    The concrete element atom have to implement: 
+    create_first_order_main_params(self, energy: float, delta_length: float) -> FirstOrderPrams
+    If the element has edges is also have to implement:
+    create_first_order_entrance_params(self, energy: float, delta_length: float) -> FirstOrderPrams
+    create_first_order_exit_params(self, energy: float, delta_length: float) -> FirstOrderPrams
     """
-    TransferMap is a basic linear transfer map for all elements.
-    """
-
+    
     def __init__(self, create_tm_param_func, delta_e_func, tm_type: TMTypes, length: float, delta_length: float = 0.0) -> None:
         super().__init__(create_tm_param_func, delta_e_func, tm_type, length, delta_length)
 
@@ -65,7 +69,3 @@ class TransferMap(Transformation):
                 " TransferMap.__mul__: unknown object in transfer map multiplication: " + str(m.__class__.__name__))
             raise Exception(
                 " TransferMap.__mul__: unknown object in transfer map multiplication: " + str(m.__class__.__name__))
-
-    @classmethod
-    def create_from_element(cls, element, params=None):
-        return cls()

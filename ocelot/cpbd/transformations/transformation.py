@@ -1,13 +1,11 @@
 import enum
-from copy import deepcopy, copy
 import logging
 from sys import flags
-from typing import Callable, Union
 from abc import ABC, abstractmethod
 
 import numpy as np
 
-from ocelot.cpbd.beam import Twiss, Particle, ParticleArray
+from ocelot.cpbd.beam import Particle, ParticleArray
 from ocelot.cpbd.elements.element import Element
 
 _logger = logging.getLogger(__name__)
@@ -23,7 +21,7 @@ class TMTypes(enum.Enum):
 
 class Transformation(ABC):
     """
-    TransferMap is a basic class of all TransferMaps and defines the Interface for them.
+    Base class for all Transforamtions.
     """
 
     def __init__(self, create_tm_param_func, delta_e_func, tm_type: TMTypes, length: float, delta_length: float = None) -> None:
@@ -58,20 +56,40 @@ class Transformation(ABC):
     @abstractmethod
     def from_element(cls, element: Element, tm_type: TMTypes = TMTypes.MAIN, delta_l: float = None, **params):
         """[summary]
-        This classmentod is mainly used to create a new transforamtion from a element. 
+        This classmethod is used to create a new transforamtion from a element. 
         With 'params' custom parameter can be added to the Transformation. 
-        :param element: Element for which the transformation is calculated
+        :param element: Element for which the transformation is calculated. The Element have to implement the hook of concrete transformation.
         :type element: Element
         :param tm_type: Type of Transformation can be TMTypes.ENTRANCE, TMTypes.MAIN or TMTypes.EXIT, defaults to TMTypes.MAIN
         :type tm_type: TMTypes, optional
         :param delta_l: If the parameter is set, just a section of the element is taken into account for the tm calculation, defaults to None
         :type delta_l: float, optional
-        :raises NotImplementedError: Have to be implemented by concret transforamtions
+        :raises NotImplementedError: If not implemented
         """
         raise NotImplementedError
 
     @classmethod
     def create(cls, main_tm_params_func, delta_e_func, length, delta_length=None, entrance_tm_params_func=None, exit_tm_params_func=None, tm_type: TMTypes = TMTypes.MAIN, **params):
+        """[summary]
+        Factory method the concrete transforamtion. 
+        :param main_tm_params_func: Function that is called on the element to calculate the transformation parameter for the main transforamtion.
+        :type main_tm_params_func: [type]
+        :param delta_e_func: Function that is called on the element to calculate the delta energy.
+        :type delta_e_func: [type]
+        :param length: Length of the element.
+        :type length: [type]
+        :param delta_length: define the delta length for which the transforamtion of the element will be calculated if delta_length is None length will be used, default is None.
+        :type delta_length: [type], optional
+        :param entrance_tm_params_func: : Function that is called on the element to calculate the transformation parameter for the entrance transforamtion, defaults to None
+        :type entrance_tm_params_func: [type], optional
+        :param exit_tm_params_func: Function that is called on the element to calculate the transformation parameter for the exit transforamtion, defaults to None
+        :type exit_tm_params_func: [type], optional
+        :param tm_type: [description], defaults to TMTypes.MAIN
+        :type tm_type: TMTypes, optional
+        :raises NotImplementedError: If the element doesn't implement the call back functions.
+        :return: Instance of the concrete transfroamt
+        :rtype: [type]
+        """
         try:
             if tm_type == TMTypes.ENTRANCE:
                 tm_params_func = entrance_tm_params_func
@@ -89,6 +107,13 @@ class Transformation(ABC):
         return cls(create_tm_param_func=tm_params_func, delta_e_func=delta_e_func, tm_type=tm_type, length=length, delta_length=delta_length, **params)
 
     def get_params(self, energy: float):
+        """[summary]
+        Calculates the parameters for the transformation
+        :param energy: [description]
+        :type energy: float
+        :return: Depends on the type of transformation
+        :rtype: [type]
+        """
         if not self._params or self._current_energy != energy:
             self._params = self.create_tm_param_func(energy, self.delta_length)
             self._current_energy = energy
@@ -139,14 +164,12 @@ class Transformation(ABC):
                 " TransferMap.apply(): Unknown type of Particle_series: " + str(prcl_series.__class__.__name))
 
     @abstractmethod
-    def map_function(self, delta_length: float = None, length: float = None):
+    def map_function(self, X: np.ndarray, energy: float) -> np.ndarray:
         """[summary]
-        This function calculate the transformation. It have to be overloaded by each transformation class.
-        :param delta_length: delta length of the element. If set the map function is calculated for delta length, defaults to None
-        :type delta_length: float, optional
-        :param length: total length of the element, some map functions may need the total length for calculation, defaults to None
-        :type length: float, optional
-        :return: a Callable (e.g Lambda) which takes a array of particales as the first and the engery as a second parameter.
-        :rtype: Callable[np.ndarray, float]
+        This function calculate the transformation. It has to be overloaded by each transformation class.
+        :param X: Particle array
+        :type X: np.ndarray
+        :param energy: Energy for which the transformation is calculated. 
+        :type energy: float
         """
         raise NotImplementedError()

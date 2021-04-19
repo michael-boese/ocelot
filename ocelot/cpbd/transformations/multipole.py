@@ -7,6 +7,12 @@ from ocelot.cpbd.elements.element import Element
 
 
 class MultipoleTM(TransferMap):
+    """[summary]
+    Implementation of the Multipole Transforamtion.
+    The concrete element atom have to implement: 
+    create_multipole_tm_main_params(self) -> MultipoleParams
+    """
+        
     def __init__(self, create_tm_param_func, delta_e_func, tm_type: TMTypes, length: float, delta_length: float = None, **params) -> None:
         super().__init__(create_tm_param_func, delta_e_func, tm_type, length, delta_length)
 

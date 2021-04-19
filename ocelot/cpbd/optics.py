@@ -142,7 +142,6 @@ def trace_obj(lattice, obj, nPoints=None):
     if nPoints is None:
         obj_list = [obj]
         for e in lattice.sequence:
-            #obj = e.dot_tms(obj)
             for tm in e.first_order_tms:
                 obj = tm * obj
                 obj.id = e.id

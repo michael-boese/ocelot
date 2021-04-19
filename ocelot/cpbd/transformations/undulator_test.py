@@ -1,14 +1,18 @@
-from copy import copy
-from ocelot.cpbd.transformations.transformation import TMTypes
-
 import numpy as np
 
+from ocelot.cpbd.transformations.transformation import TMTypes
 from ocelot.cpbd.high_order import m_e_GeV
 from ocelot.cpbd.elements.element import Element
 from ocelot.cpbd.transformations.transfer_map import TransferMap, TMTypes
 
 
 class UndulatorTestTM(TransferMap):
+    """[summary]
+    Implementation of a Undulator Test Transforamtion.
+    The concrete element atom have to implement: 
+    create_undulator_test_tm_main_params(self) -> UndulatorTestParams
+    """
+
     def __init__(self, create_tm_param_func, delta_e_func, tm_type: TMTypes, length: float, delta_length: float, **params) -> None:
         ndiv = params.get('ndiv')
         self.ndiv = ndiv if ndiv else 5

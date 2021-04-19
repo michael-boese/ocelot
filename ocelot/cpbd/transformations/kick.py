@@ -1,19 +1,17 @@
-from contextlib import nullcontext
-from copy import copy
-
 import numpy as np
 
 from ocelot.cpbd.high_order import m_e_GeV
 from ocelot.cpbd.tm_utils import transform_vec_ent, transform_vec_ext
 from ocelot.cpbd.transformations.transfer_map import TransferMap
-
 from ocelot.cpbd.transformations.transformation import Transformation, TMTypes
 from ocelot.cpbd.elements.element import Element
 
 
 class KickTM(Transformation):
     """[summary]
-    Implementation of the Kick Transforamtion. The class expact hat
+    Implementation of the Kick Transforamtion.
+    The concrete element atom have to implement at least 'create_kick_main_params(self) -> KickParams'. If the element has edges 
+        'create_kick_entrance_params(self) -> KickParams' and 'create_kick_exit_params(self) -> KickParams' have to be implemented as well.
     """
 
     def __init__(self, create_tm_param_func, delta_e_func, tm_type: TMTypes, length: float, delta_length: float = 0.0, **params) -> None:    
@@ -25,7 +23,7 @@ class KickTM(Transformation):
     @classmethod
     def from_element(cls, element: Element, tm_type: TMTypes = TMTypes.MAIN, delta_l=None, **params):
         """[summary]
-        :param element: An Element which implement at least 'create_kick_main_params(self) -> KickParams'. If the element has edges 
+        :param element: An Element which implements at least 'create_kick_main_params(self) -> KickParams'. If the element has edges 
         'create_kick_entrance_params(self) -> KickParams' and 'create_kick_exit_params(self) -> KickParams' have to be implemented as well.
         :type element: Element
         :param tm_type: Type of Transformation can be TMTypes.ENTRANCE, TMTypes.MAIN or TMTypes.EXIT, defaults to TMTypes.MAIN

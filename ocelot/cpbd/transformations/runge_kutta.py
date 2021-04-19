@@ -6,6 +6,15 @@ from ocelot.cpbd.elements.element import Element
 
 
 class RungeKuttaTM(TransferMap):
+    """[summary]
+    Implementation of the Runge Kutta transformation.
+    The concrete element atom have to implement: 
+    create_runga_kutta_main_params(self) -> RungeKuttaParams
+    If the element has edges is also have to implement:
+    create_runga_kutta_entrance_params(self) -> RungeKuttaParams
+    create_runga_kutta_exit_params(self) -> RungeKuttaParams
+    """
+
     def __init__(self, create_tm_param_func, delta_e_func, tm_type: TMTypes, length: float, delta_length: float = 0.0, **params) -> None:
         super().__init__(create_tm_param_func, delta_e_func, tm_type, length, delta_length)
         s_start = params.get('s_start')

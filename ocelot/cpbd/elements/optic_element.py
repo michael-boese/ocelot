@@ -1,6 +1,6 @@
 from copy import copy
 from ocelot.cpbd.transformations.transfer_map import TransferMap
-from typing import List, Dict, Type
+from typing import List, Dict, Type, Callable
 
 
 import numpy as np
@@ -20,31 +20,37 @@ class OpticElement:
     __is_init = False  # needed to disable __getattr__ and __setattr__ until __init__ is executed
 
     def __init__(self, element: Element, tm: Type[Transformation], default_tm: Type[Transformation], **params) -> None:
+        """[summary]
+        Creates a optic element which holds element atom and its transfromation. Each concret optic element have to implement its own __init__ 
+        it the concret element parameters.
+        :param element: Concret element atom.
+        :type element: Element
+        :param tm: Transforamtion that is used by the element.
+        :type tm: Type[Transformation]
+        :param default_tm: If tm is not supported by the specific element the default_tm is used.
+        :type default_tm: Type[Transformation]
+        """
         self.element = element
         self.default_tm = default_tm
         self._first_order_tms = self._create_tms(self.element, TransferMap)  # every optics element has a first_order tm to calculate e.g Twiss Paramters
-        self._kwargs = params # Storing transforamtion sp
+        self._kwargs = params  # Storing transforamtion sp
         if tm == TransferMap:
             self._tms = self._first_order_tms
             self._tm_class_type = tm
         else:
             self.__init_tms(tm, **params)
-        self.__is_init = True  # needed to disable __getattr__ and __setattr__ in __init__ phase
+        self.__is_init = True  # needed to disable __getattr__ and __setattr__ in __init__ phase. Do not add new attributes after.
 
-        # self.__dict__['element'] = element
-        # self.__dict__['_tm_class_type'] = tm
-        # self.__dict__['_tms'] = self._create_tms(self.element, tm)
+    # To access all getter attributes of element to fulfill old iface
 
-    # To access all getter attributes of element
     def __getattr__(self, name):
         if self.__is_init and name in self.element.__dict__:
             return getattr(self.element, name)
         raise AttributeError(f"{self.__class__.__name__} object has no attribute {name}")
 
-    # To access all setter attributes of element
+    # To access all setter attributes of element to fulfill old iface
     def __setattr__(self, name, value):
         if self.__is_init and name in self.element.__dict__:
-            # TODO: If a element attribute is set, tm have to be recalculated. That means reset the cashed values in tms
             for tm in self._tms:
                 tm._clean_cashed_values()
             for tm in self._first_order_tms:
@@ -53,14 +59,31 @@ class OpticElement:
         return object.__setattr__(self, name, value)
 
     @property
-    def tms(self):
+    def tms(self) -> List[Callable[[np.ndarray, float], np.ndarray]]:
+        """[summary]
+        Returns a list of transformaton function [f(X, energy),...].
+        :return: List of first order transformations
+        :rtype: List[Callable[[np.ndarray, float], np.ndarray]]
+        """
         return self._tms
 
     @property
-    def first_order_tms(self):
+    def first_order_tms(self) -> List[Callable[[np.ndarray, float], np.ndarray]]:
+        """[summary]
+        Returns a list of first order transformaton function [f(X, energy),...].
+        :return: List of first order transformations
+        :rtype: List[Callable[[np.ndarray, float], np.ndarray]]
+        """
         return self._first_order_tms
 
-    def B(self, energy):
+    def B(self, energy: float) -> List[np.ndarray]:
+        """[summary]
+        Calculates B matrices for second order transformation if second order transformation is set otherwise B matrices are calculated for first order transformation.
+        :param energy: [description]
+        :type energy: float
+        :return: List of B matrices
+        :rtype: List[np.ndarray]
+        """
         tms = self._tms if self._tm_class_type == SecondTM else self._first_order_tms
         res = []
         E = energy
@@ -69,7 +92,14 @@ class OpticElement:
             E += tm.get_delta_e()
         return res
 
-    def R(self, energy):
+    def R(self, energy: float) -> List[np.ndarray]:
+        """[summary]
+        Calculates R matrices for second order transformation if second order transformation is set otherwise the B matrices are calculated for first order transformation.
+        :param energy: [description]
+        :type energy: float
+        :return: [description]
+        :rtype: List[np.ndarray]
+        """
         tms = self._tms if self._tm_class_type == SecondTM else self._first_order_tms
         res = []
         E = energy
@@ -78,7 +108,14 @@ class OpticElement:
             E += tm.get_delta_e()
         return res
 
-    def T(self, energy):
+    def T(self, energy: float) -> List[np.ndarray]:
+        """[summary]
+        Calculates the T matrices for second order transformation if second order transformation is set otherwise a zero matrices will be returned.
+        :param energy: [description]
+        :type energy: float
+        :return: List of B matrices
+        :rtype: List[np.ndarray]
+        """
         if self._tm_class_type != SecondTM:
             return [np.zeros((6, 6, 6)) for _ in self._first_order_tms]
         res = []
@@ -88,8 +125,12 @@ class OpticElement:
             E += tm.get_delta_e()
         return res
 
-
-    def __init_tms(self, tm, **params):
+    def __init_tms(self, tm: Transformation, **params):
+        """[summary]
+        Initialize the transforamtions. If the transforamtion is not supported default_tm will be used.
+        :param tm: Transforamtion to be set.
+        :type tm: Transformation
+        """
         try:
             self._tms = self._create_tms(self.element, tm, **params)
             self._tm_class_type = tm
@@ -98,27 +139,24 @@ class OpticElement:
             self._tms = self._create_tms(self.element, self.default_tm, **params)
             self._tm_class_type = self.default_tm
 
-    def dot_tms(self, obj):
+    def apply(self, X: np.ndarray, energy: float):
         """[summary]
-        Multiplies all transforamtions with the object 
-        :param obj: Object with which the transformations are be multiplied.
-        :type obj: Twiss, Particle, ParticleArray
-        :return: Deplends on the input type of obj.
-        :rtype: Twiss, Particle, ParticleArray
+        Apply all transformations on particle array.
+        :param X: Array of particles
+        :type X: np.ndarray
+        :param energy: Given energy
+        :type energy: float
         """
-        new_obj = self._tms[0] * obj
-        if len(self._tms) == 1:
-            return new_obj
-        else:
-            for tm in self._tms[1:]:
-                new_obj = tm * new_obj
-            return new_obj
-
-    def apply(self, X, energy):
         for tm in self._tms:
             tm.map_function(X, energy)
 
     def set_tm(self, tm: Transformation, **params):
+        """[summary]
+        Sets a new transforamtion for the element. Transformation specific parameter can be added via **params e.g elem.set_tm(tm=RungaKuttraTM, npoints=2000),
+        Note: Transformation specific parameters can be also set via __init__.
+        :param tm: 
+        :type tm: Transformation
+        """
         new_kwargs = params if params and params != self._kwargs else None
         if tm != self._tm_class_type or new_kwargs:
             if tm == self.default_tm:
@@ -130,7 +168,7 @@ class OpticElement:
                 else:
                     self.__init_tms(tm, **self._kwargs)
 
-            self._tm_class_type = tm    
+            self._tm_class_type = tm
             for tm in self._tms:
                 tm._clean_cashed_values()
 
@@ -194,10 +232,6 @@ class OpticElement:
             tms.append(tm.from_element(element, TMTypes.MAIN, **params))
         #tms = [tm.create(element, TMTypes.ROT_EXIT)]
         return tms
-
-    @classmethod
-    def create(cls, element: Element, tm: Type[Transformation]):
-        return OpticElement(element=element, tm=tm)
 
     def __str__(self):
         return self.element.__str__()

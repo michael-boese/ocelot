@@ -1,14 +1,21 @@
-from copy import copy
-
 import numpy as np
+
 from ocelot.cpbd.tm_utils import SecondOrderMult, transform_vec_ent, transform_vec_ext, \
     transfer_map_rotation, sym_matrix
-
 from ocelot.cpbd.transformations.transformation import Transformation, TMTypes
 from ocelot.cpbd.elements.element import Element
 
 
 class SecondTM(Transformation):
+    """[summary]
+    Implementation of the second order transformation.
+    The concrete element atom have to implement: 
+    create_second_order_main_params(self, energy: float, delta_length: float) -> FirstOrderPrams
+    If the element has edges is also have to implement:
+    create_second_order_entrance_params(self, energy: float, delta_length: float) -> FirstOrderPrams
+    create_second_order_exit_params(self, energy: float, delta_length: float) -> FirstOrderPrams
+    """
+
     def __init__(self, create_tm_param_func, delta_e_func, tm_type: TMTypes, length: float, delta_length: float = 0.0) -> None:
         self.multiplication = SecondOrderMult().tmat_multip
         super().__init__(create_tm_param_func, delta_e_func, tm_type, length, delta_length)

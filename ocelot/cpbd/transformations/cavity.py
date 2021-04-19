@@ -1,13 +1,20 @@
 import numpy as np
 
 from ocelot.cpbd.transformations.transfer_map import TransferMap, TMTypes
-from ocelot.cpbd.transformations.transformation import Transformation
 from ocelot.cpbd.elements.element import Element
 from ocelot.cpbd.high_order import m_e_GeV
 from ocelot.common.globals import speed_of_light
 
 
 class CavityTM(TransferMap):
+    """[summary]
+    Implementation of the Cavity Transforamtion.
+    The concrete element atom have to implement: 
+    create_cavity_tm_main_params(self, energy: float, delta_length: float) -> CavityParams
+    create_cavity_tm_entrance_params(self, energy: float, delta_length: float) -> CavityParams
+    create_cavity_tm_exit_params(self, energy: float, delta_length: float) -> CavityParams
+    """
+    
     def __init__(self, create_tm_param_func, delta_e_func, tm_type: TMTypes, length: float, delta_length: float) -> None:
         super().__init__(create_tm_param_func, delta_e_func, tm_type, length, delta_length=delta_length)
 
